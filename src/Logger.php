@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace flotzilla\Logger;
 
-use _HumbugBoxa35debbd0202\Nette\Neon\Exception;
+use Exception;
 use flotzilla\Logger\Handler\HandlerInterface;
 use Psr\Log\InvalidArgumentException;
 use Psr\Log\LoggerInterface;

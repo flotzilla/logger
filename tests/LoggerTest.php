@@ -1,8 +1,6 @@
 <?php
 
-
 namespace flotzilla\Logger\Test;
-
 
 use flotzilla\Logger\Formatter\SimpleLineFormatter;
 use flotzilla\Logger\Handler\FileHandler;
@@ -11,19 +9,33 @@ use PHPUnit\Framework\TestCase;
 
 class LoggerTest extends TestCase
 {
-
     public function testCreationSuccess()
     {
         $handlers = [
-            new FileHandler("main", "/tmp", new SimpleLineFormatter()),
-            new FileHandler("additional", "/tmp", new SimpleLineFormatter())
+            new FileHandler('main', '/tmp', new SimpleLineFormatter()),
+            new FileHandler('additional', '/tmp', new SimpleLineFormatter())
         ];
 
         $logger = new Logger('main', $handlers);
-        $logger->info("ololo");
+        $logger->info('ololo');
 
 
-        $this->assertTrue(file_exists("/tmp/main-" . date("j.n.Y") . '.log'));
-        $this->assertTrue(file_exists("/tmp/additional-" . date("j.n.Y") . '.log'));
+        $this->assertTrue(file_exists('/tmp/main-' . date('j.n.Y') . '.log'));
+        $this->assertTrue(file_exists('/tmp/additional-' . date('j.n.Y') . '.log'));
+    }
+
+    public function testLogDirectoryCreationSuccess()
+    {
+        $handlers = [
+            new FileHandler('main', 'tmp', new SimpleLineFormatter()),
+        ];
+
+        $logger = new Logger('main', $handlers);
+        $logger->info('test');
+
+        $this->assertTrue(file_exists('tmp'));
+        $this->assertTrue(is_dir('tmp'));
+        $this->assertTrue(is_writable('tmp'));
+        $this->assertTrue(file_exists('tmp/main-' . date('j.n.Y') . '.log'));
     }
 }

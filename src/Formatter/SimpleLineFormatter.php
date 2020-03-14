@@ -22,10 +22,10 @@ class SimpleLineFormatter implements FormatterInterface
 
     public function format(array $record)
     {
-        $parsedContext = $this->parseContext($record['context']);
+        $parsedContext = isset($record['context']) ? $this->parseContext($record['context']) : null;
 
         return $this->dataSeparatorStart . $record['date'] . $this->dataSeparatorEnd
-        . $this->dataSeparatorStart . $record['level'] . $this->dataSeparatorEnd
+        . $this->dataSeparatorStart . $record['level'] . strtoupper($this->dataSeparatorEnd)
         . $this->dataSeparatorStart . $record['source'] . $this->dataSeparatorEnd
         . $this->dataSeparatorStart . $record['message'] . $this->dataSeparatorEnd
         . ($parsedContext ? $this->dataSeparatorStart . $parsedContext . $this->dataSeparatorEnd : '') . PHP_EOL;

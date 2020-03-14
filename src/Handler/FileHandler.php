@@ -54,28 +54,55 @@ class FileHandler implements HandlerInterface
         );
     }
 
+    /**
+     * Check if logging directory available for witting
+     * @return bool
+     */
     public function checkAvailability(): bool
     {
         return is_dir($this->logDir) && is_writable($this->logDir);
     }
 
-    public function makeLogDirectory()
+    /**
+     * Create logging directory, if there is no one yet
+     *
+     * @return void
+     */
+    private function makeLogDirectory()
     {
         if (!is_dir($this->logDir)) {
             mkdir($this->logDir, 0755, true);
         }
     }
 
+    /**
+     * @param string $log
+     * @return bool
+     */
     private function appendLog(string $log): bool
     {
-        // TODO add check for logDir double // at the end
         // TODO date format for us countries
         $result = file_put_contents(
-            $this->logDir . DIRECTORY_SEPARATOR . $this->handlerName . '-' . date("j.n.Y") . '.log',
+            $this->pathSanitize($this->logDir) . DIRECTORY_SEPARATOR
+            . $this->handlerName . '-' . date("j.n.Y") . '.log',
             $log,
             FILE_APPEND
         );
 
         return $result !== false;
+    }
+
+    private function pathSanitize(string $path): string
+    {
+        if ($path === '/'){
+            return $path;
+        }
+
+        // found slash at end
+        if (strpos($path, '/', strlen($path) - 1)){
+            return substr($path, 0, strlen($path) - 1);
+        }
+
+        return $path;
     }
 }
