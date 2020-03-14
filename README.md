@@ -1,6 +1,6 @@
 [![MIT License][license-shield]][license-url]
 
-#Logger
+# Logger
 Simple PSR-3 logger interface implementation
 
 ## Requirements

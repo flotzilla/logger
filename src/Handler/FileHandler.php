@@ -39,8 +39,10 @@ class FileHandler implements HandlerInterface
     }
 
     /**
-     * @param array $record
-     * @return bool
+     * Write record to file
+     *
+     * @param array $record to be written. Array context should be standardised with implemented formatter
+     * @return bool operation success status
      * @throws InvalidConfigurationException
      */
     public function handle(array $record): bool
@@ -76,23 +78,38 @@ class FileHandler implements HandlerInterface
     }
 
     /**
-     * @param string $log
-     * @return bool
+     * Append content to log file
+     * If log directory does not exists will return false.
+     * If content cannot be written to file or file cannot be opened will return false
+     *
+     * @param string $log string to be written to file
+     * @return bool operation success status
      */
     private function appendLog(string $log): bool
     {
-        // TODO date format for us countries
-        $result = file_put_contents(
-            $this->pathSanitize($this->logDir) . DIRECTORY_SEPARATOR
-            . $this->handlerName . '-' . date("j.n.Y") . '.log',
-            $log,
-            FILE_APPEND
-        );
+        $result = false;
 
-        return $result !== false;
+        if (!$this->checkAvailability()){
+            return $result;
+        }
+
+        $fileName = $this->pathSanitise($this->logDir) . DIRECTORY_SEPARATOR
+            . $this->handlerName . '-' . date("j.n.Y") . '.log';
+
+        if ($file = fopen($fileName, 'a')) {
+            $result = fwrite($file, $log) !== false && fclose($file);
+        }
+
+        return $result;
     }
 
-    private function pathSanitize(string $path): string
+    /**
+     * Remove slashes from end of the path string
+     *
+     * @param string $path string to be sanitised
+     * @return string sanitised string
+     */
+    private function pathSanitise(string $path): string
     {
         if ($path === '/'){
             return $path;

@@ -5,13 +5,15 @@ namespace flotzilla\Logger\Test\Handler;
 use flotzilla\Logger\Exception\InvalidConfigurationException;
 use flotzilla\Logger\Formatter\SimpleLineFormatter;
 use flotzilla\Logger\Handler\FileHandler;
+use flotzilla\Logger\Test\Formatter\TestFormatter;
 use PHPUnit\Framework\TestCase;
 
 class FileHandlerTest extends TestCase
 {
     protected function tearDown()
     {
-        rmdir('logs');
+        // remove all files from directory
+        system("rm -rf ".escapeshellarg('logs'));;
     }
 
     public function testDirectoryPermission()
@@ -48,13 +50,81 @@ class FileHandlerTest extends TestCase
         $this->assertTrue($handler->checkAvailability());
     }
 
-//    public function testSanitise()
-//    {
-//        $handler = new FileHandler('test/', 'logs', new SimpleLineFormatter());
-//
-//        $this->assertEquals('test', $handler->pathSanitize('test'));
-//        $this->assertEquals('test', $handler->pathSanitize('test/'));
-//        $this->assertEquals('/tmp/test', $handler->pathSanitize('/tmp/test/'));
-//        $this->assertEquals('/', $handler->pathSanitize('/'));
-//    }
+    public function testHandleEmptyFormatter()
+    {
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage("Default Logger formatter is not initialized");
+
+        $handler = new FileHandler('test', 'logs');
+        $handler->handle([]);
+    }
+
+    public function testHandleSuccess()
+    {
+        $file = 'logs/test-' . date("j.n.Y") . '.log';
+        $handler = new FileHandler('test', 'logs', new TestFormatter);
+        $record = [ 'message' => 'test'];
+
+        $this->assertFalse(file_exists($file));
+
+        $handler->handle($record);
+
+        $this->assertTrue(file_exists('logs'));
+        $this->assertTrue(filesize($file) > 0);
+    }
+
+    public function testHandleSanitise()
+    {
+        $file = 'logs/test-' . date("j.n.Y") . '.log';
+        $handler = new FileHandler('test', 'logs/', new TestFormatter);
+        $record = [ 'message' => 'test'];
+
+        $this->assertFalse(file_exists($file));
+
+        $handler->handle($record);
+
+        $this->assertTrue(file_exists('logs'));
+        $this->assertTrue(filesize($file) > 0);
+    }
+
+    public function testHandleSanitiseSubdir()
+    {
+        $file = 'logs/tmp/test-' . date("j.n.Y") . '.log';
+        $handler = new FileHandler('test', 'logs/tmp', new TestFormatter);
+        $record = [ 'message' => 'test'];
+
+        $this->assertFalse(file_exists($file));
+
+        $handler->handle($record);
+
+        $this->assertTrue(file_exists('logs'));
+        $this->assertTrue(filesize($file) > 0);
+    }
+
+    public function testHandleSanitiseSubdirSlash()
+    {
+        $file = 'logs/tmp/test-' . date("j.n.Y") . '.log';
+        $handler = new FileHandler('test', 'logs/tmp/', new TestFormatter);
+        $record = [ 'message' => 'test'];
+
+        $this->assertFalse(file_exists($file));
+
+        $handler->handle($record);
+
+        $this->assertTrue(file_exists('logs'));
+        $this->assertTrue(filesize($file) > 0);
+    }
+
+    public function testCorruptAppendLog()
+    {
+        $file = 'logs/test-' . date("j.n.Y") . '.log';
+        $handler = new FileHandler('test', 'logs', new TestFormatter);
+        $record = [ 'message' => 'test'];
+
+        $this->assertFalse(file_exists($file));
+
+        system("rm -rf ".escapeshellarg('logs'));
+        $result = $handler->handle($record);
+        $this->assertFalse($result);
+    }
 }
