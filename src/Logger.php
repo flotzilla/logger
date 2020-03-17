@@ -4,8 +4,9 @@ declare(strict_types=1);
 
 namespace flotzilla\Logger;
 
+use DateTimeZone;
 use Exception;
-use flotzilla\Logger\Handler\HandlerInterface;
+use flotzilla\Logger\Channel\ChannelInterface;
 use Psr\Log\InvalidArgumentException;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LoggerTrait;
@@ -14,26 +15,23 @@ class Logger implements LoggerInterface
 {
     use LoggerTrait;
 
-    public const DI = 'LoggerDI';
+    /**
+     * @var ChannelInterface[]
+     */
+    private $channels;
 
-    /**
-     * @var string
-     */
-    private $channelName;
-    /**
-     * @var array
-     */
-    private $handlers;
+    /** @var DateTimeZone $timeZone */
+    private $timeZone;
 
     /**
      * Logger constructor.
-     * @param string $channelName
-     * @param HandlerInterface[] $handlers
+     * @param ChannelInterface[] $channels
+     * @param DateTimeZone|null $tz
      */
-    public function __construct(string $channelName, array $handlers = [])
+    public function __construct(array $channels = [], DateTimeZone $tz = null)
     {
-        $this->channelName = $channelName;
-        $this->handlers = $handlers;
+        $this->channels = $channels;
+        $this->timeZone = $tz ?: new DateTimeZone(date_default_timezone_get());
     }
 
     /**
@@ -50,7 +48,7 @@ class Logger implements LoggerInterface
      */
     public function log($level, $message, array $context = [])
     {
-        if (!in_array($level, LogLevel::LOG_LEVELS)){
+        if (!in_array($level, LogLevel::LOG_LEVELS)) {
             throw new InvalidArgumentException("{$level} Log level is not exists");
         }
 
@@ -61,27 +59,27 @@ class Logger implements LoggerInterface
         $record['level'] = $level;
         $record['date'] = date('Y.j.m-h:i:s');
         $record['source'] = 'test source'; //$_SERVER['REMOTE_ADDR']
-        $record['context'] = $context;
         $record['message'] = $message;
+        $record['context'] = $context;
 
-        foreach ($this->handlers as $handler) {
-            $handler->handle($record);
+        foreach ($this->channels as $channel) {
+            $channel->handle($record);
         }
     }
 
     /**
-     * @return string
+     * @return ChannelInterface[]
      */
-    public function getChannelName(): string
+    public function getChannels(): array
     {
-        return $this->channelName;
+        return $this->channels;
     }
 
     /**
-     * @return HandlerInterface[]
+     * @param ChannelInterface[] $channels
      */
-    public function getHandlers(): array
+    public function setChannels(array $channels): void
     {
-        return $this->handlers;
+        $this->channels = $channels;
     }
 }

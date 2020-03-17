@@ -6,8 +6,11 @@ namespace flotzilla\Logger\Formatter;
 
 class SimpleLineFormatter implements FormatterInterface
 {
-    private $dataSeparatorStart = "[";
-    private $dataSeparatorEnd = "]";
+    /** @var string $dataSeparatorStart */
+    protected $dataSeparatorStart = "[";
+
+    /** @var string $dataSeparatorEnd */
+    protected $dataSeparatorEnd = "]";
 
     /**
      * SimpleFormatter constructor.
@@ -31,6 +34,10 @@ class SimpleLineFormatter implements FormatterInterface
         . ($parsedContext ? $this->dataSeparatorStart . $parsedContext . $this->dataSeparatorEnd : '') . PHP_EOL;
     }
 
+    /**
+     * @param array|string $context
+     * @return string
+     */
     private function parseContext($context)
     {
         $parsedContext = '';
@@ -38,7 +45,6 @@ class SimpleLineFormatter implements FormatterInterface
         if (is_array($context)) {
 
             $count = count($context);
-
             if ($count == 0) {
                 return $parsedContext;
             }

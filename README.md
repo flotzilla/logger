@@ -1,7 +1,7 @@
 [![MIT License][license-shield]][license-url]
 
 # Logger
-Simple PSR-3 logger interface implementation
+Simple PSR-3 logger interface implementation with huge influence of monolog
 
 ## Requirements
 
