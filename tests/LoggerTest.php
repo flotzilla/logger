@@ -37,7 +37,7 @@ class LoggerTest extends TestCase
 
     }
 
-    public function testLogWithErrorLogLevel()
+    public function testCreationMinMaxLogLevels()
     {
         $channels = [
             new Channel(
@@ -46,7 +46,31 @@ class LoggerTest extends TestCase
                     new FileHandler('test-main', 'tmp', new SimpleLineFormatter()),
                     new FileHandler('test-additional', 'tmp', new SimpleLineFormatter())
                 ],
-                LogLevel::ERROR)
+                LogLevel::DEBUG,
+                LogLevel::CRITICAL
+            )
+
+        ];
+
+        $logger = new Logger($channels);
+        $logger->info("debug message");
+
+        $this->assertTrue(file_exists('tmp'));
+        $this->assertTrue(is_dir('tmp'));
+        $this->assertTrue(is_writable('tmp'));
+        $this->assertTrue(file_exists('tmp/test-main-' . date('j.n.Y') . '.log'));
+        $this->assertTrue(file_exists('tmp/test-additional-' . date('j.n.Y') . '.log'));
+
+    }
+
+    public function testLogWithErrorLogLevel()
+    {
+        $channels = [
+            new Channel(
+                'test', [
+                new FileHandler('test-main', 'tmp', new SimpleLineFormatter()),
+                new FileHandler('test-additional', 'tmp', new SimpleLineFormatter())
+            ], LogLevel::ERROR)
         ];
 
         $logger = new Logger($channels);
@@ -63,12 +87,10 @@ class LoggerTest extends TestCase
     {
         $channel = new Channel
         (
-            'test',
-            [
-                new FileHandler('test-main', 'tmp', new SimpleLineFormatter()),
-                new FileHandler('test-additional', 'tmp', new SimpleLineFormatter()),
-            ],
-            LogLevel::DEBUG
+            'test', [
+            new FileHandler('test-main', 'tmp', new SimpleLineFormatter()),
+            new FileHandler('test-additional', 'tmp', new SimpleLineFormatter()),
+        ], LogLevel::DEBUG
         );
 
         $channel->setEnabled(false);

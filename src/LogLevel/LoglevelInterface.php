@@ -22,4 +22,17 @@ interface LoglevelInterface
      * @return string
      */
     public function getMaxLogLevel(): string;
+
+    /**
+     * @param string $level
+     * @return mixed
+     *
+     * @throws InvalidLogLevelException
+     */
+    public function setMinLogLevel(string $level): void;
+
+    /**
+     * @return string
+     */
+    public function getMinLogLevel(): string ;
 }

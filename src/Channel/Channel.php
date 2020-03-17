@@ -23,17 +23,27 @@ class Channel implements ChannelInterface, LoglevelInterface
     /** @var bool $enabled */
     private $enabled = true;
 
+    /** @var string $maxLogLevel */
     private $maxLogLevel;
+
+    /** @var string $minLogLevel */
+    private $minLogLevel;
 
     /**
      * Channel constructor.
      * @param string $channelName
      * @param array $handlers
      * @param string|null $maxLogLevel
+     * @param string|null $minLogLevel
      *
      * @throws InvalidLogLevelException
      */
-    public function __construct(string $channelName, array $handlers = [], string $maxLogLevel = null)
+    public function __construct(
+        string $channelName,
+        array $handlers = [],
+        string $maxLogLevel = null,
+        string $minLogLevel = null
+    )
     {
         $this->channelName = $channelName;
         $this->handlers = $handlers;
@@ -44,7 +54,14 @@ class Channel implements ChannelInterface, LoglevelInterface
             throw new InvalidLogLevelException();
         }
 
+        if ($minLogLevel === null) {
+            $minLogLevel = LogLevel::EMERGENCY;
+        } else if (!$this->isLogLevelValid($minLogLevel)) {
+            throw new InvalidLogLevelException();
+        }
+
         $this->maxLogLevel = strtolower($maxLogLevel);
+        $this->minLogLevel = strtolower($minLogLevel);
     }
 
     /**
@@ -56,7 +73,8 @@ class Channel implements ChannelInterface, LoglevelInterface
             return;
         }
 
-        if (!$this->maxLogLevelCheck($record['level'], $this->maxLogLevel)) {
+        if (!$this->maxLogLevelCheck($record['level'], $this->maxLogLevel)
+            || !$this->minLogLevelCheck($record['level'], $this->minLogLevel)) {
             return;
         }
 
@@ -135,5 +153,27 @@ class Channel implements ChannelInterface, LoglevelInterface
         if ($this->maxLogLevelCheck($level, $this->maxLogLevel)) {
             $this->maxLogLevel = strtolower($level);
         }
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function setMinLogLevel(string $level): void
+    {
+        if (!$this->isLogLevelValid($level)) {
+            throw new InvalidLogLevelException();
+        }
+
+        if ($this->maxLogLevelCheck($level, $this->minLogLevel)) {
+            $this->minLogLevel = strtolower($level);
+        }
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getMinLogLevel(): string
+    {
+        return $this->minLogLevel;
     }
 }
