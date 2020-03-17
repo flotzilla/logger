@@ -31,7 +31,6 @@ interface ChannelInterface
      */
     public function getChannelName(): string;
 
-
     /**
      * @param array $record
      * @return Generator

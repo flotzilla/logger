@@ -4,11 +4,16 @@ declare(strict_types=1);
 
 namespace flotzilla\Logger\Channel;
 
-use Generator;
+use flotzilla\Logger\Exception\InvalidLogLevelException;
+use flotzilla\Logger\LogLevel\LogLevel;
+use flotzilla\Logger\LogLevel\LoglevelInterface;
+use flotzilla\Logger\LogLevel\LogLevelTrait;
 use flotzilla\Logger\Handler\HandlerInterface;
 
-class Channel implements ChannelInterface
+class Channel implements ChannelInterface, LoglevelInterface
 {
+    use LogLevelTrait;
+
     /** @var string $channelName */
     private $channelName;
 
@@ -23,12 +28,23 @@ class Channel implements ChannelInterface
     /**
      * Channel constructor.
      * @param string $channelName
-     * @param HandlerInterface[] $handlers
+     * @param array $handlers
+     * @param string|null $maxLogLevel
+     *
+     * @throws InvalidLogLevelException
      */
-    public function __construct(string $channelName, array $handlers = [])
+    public function __construct(string $channelName, array $handlers = [], string $maxLogLevel = null)
     {
         $this->channelName = $channelName;
         $this->handlers = $handlers;
+
+        if ($maxLogLevel === null) {
+            $maxLogLevel = LogLevel::DEBUG;
+        } else if (!$this->isLogLevelValid($maxLogLevel)) {
+            throw new InvalidLogLevelException();
+        }
+
+        $this->maxLogLevel = strtolower($maxLogLevel);
     }
 
     /**
@@ -40,7 +56,9 @@ class Channel implements ChannelInterface
             return;
         }
 
-        // TODO check for max log level
+        if (!$this->maxLogLevelCheck($record['level'], $this->maxLogLevel)) {
+            return;
+        }
 
         foreach ($this->handlers as $handler) {
             $handler->handle($record);
@@ -95,5 +113,27 @@ class Channel implements ChannelInterface
     public function setEnabled(bool $enabled): void
     {
         $this->enabled = $enabled;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getMaxLogLevel(): string
+    {
+        return $this->maxLogLevel;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function setMaxLogLevel(string $level)
+    {
+        if (!$this->isLogLevelValid($level)) {
+            throw new InvalidLogLevelException();
+        }
+
+        if ($this->maxLogLevelCheck($level, $this->maxLogLevel)) {
+            $this->maxLogLevel = strtolower($level);
+        }
     }
 }

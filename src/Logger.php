@@ -7,7 +7,8 @@ namespace flotzilla\Logger;
 use DateTimeZone;
 use Exception;
 use flotzilla\Logger\Channel\ChannelInterface;
-use Psr\Log\InvalidArgumentException;
+use flotzilla\Logger\Exception\InvalidLogLevelException;
+use flotzilla\Logger\LogLevel\LogLevel;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LoggerTrait;
 
@@ -43,13 +44,13 @@ class Logger implements LoggerInterface
      *
      * @return void
      *
-     * @throws InvalidArgumentException
+     * @throws InvalidLogLevelException
      * @throws Exception
      */
     public function log($level, $message, array $context = [])
     {
-        if (!in_array($level, LogLevel::LOG_LEVELS)) {
-            throw new InvalidArgumentException("{$level} Log level is not exists");
+        if (!in_array(strtolower($level), LogLevel::LOG_LEVELS)) {
+            throw new InvalidLogLevelException("{$level} Log level is not exists");
         }
 
         // TODO check if string or object have toString method

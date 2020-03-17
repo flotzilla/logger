@@ -6,6 +6,5 @@ namespace flotzilla\Logger\Handler;
 
 interface HandlerInterface
 {
-
     public function handle(array $record): bool;
 }
