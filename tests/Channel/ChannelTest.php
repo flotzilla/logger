@@ -20,7 +20,6 @@ class ChannelTest extends TestCase
         $this->channel = new Channel('test-channel');
     }
 
-
     public function testIsEnabled()
     {
         $this->assertTrue($this->channel->isEnabled());
