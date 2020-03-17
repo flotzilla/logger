@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace flotzilla\Logger\Channel;
 
 use flotzilla\Logger\Handler\HandlerInterface;
-use Generator;
 
 interface ChannelInterface
 {
@@ -33,7 +32,6 @@ interface ChannelInterface
 
     /**
      * @param array $record
-     * @return Generator
      */
     public function handle(array $record);
 }

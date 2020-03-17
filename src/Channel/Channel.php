@@ -51,13 +51,13 @@ class Channel implements ChannelInterface, LoglevelInterface
         if ($maxLogLevel === null) {
             $maxLogLevel = LogLevel::DEBUG;
         } else if (!$this->isLogLevelValid($maxLogLevel)) {
-            throw new InvalidLogLevelException();
+            throw new InvalidLogLevelException("Invalid {$maxLogLevel} max level parameter");
         }
 
         if ($minLogLevel === null) {
             $minLogLevel = LogLevel::EMERGENCY;
         } else if (!$this->isLogLevelValid($minLogLevel)) {
-            throw new InvalidLogLevelException();
+            throw new InvalidLogLevelException("Invalid {$minLogLevel} max level parameter");
         }
 
         $this->maxLogLevel = strtolower($maxLogLevel);

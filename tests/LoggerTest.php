@@ -60,7 +60,56 @@ class LoggerTest extends TestCase
         $this->assertTrue(is_writable('tmp'));
         $this->assertTrue(file_exists('tmp/test-main-' . date('j.n.Y') . '.log'));
         $this->assertTrue(file_exists('tmp/test-additional-' . date('j.n.Y') . '.log'));
+    }
 
+    public function testCreationMinMaxLogLevelsSkipLower()
+    {
+        $channels = [
+            new Channel(
+                'test',
+                [
+                    new FileHandler('test-main', 'tmp', new SimpleLineFormatter()),
+                    new FileHandler('test-additional', 'tmp', new SimpleLineFormatter())
+                ],
+                LogLevel::DEBUG,
+                LogLevel::ALERT
+            )
+
+        ];
+
+        $logger = new Logger($channels);
+        $logger->emergency("debug message");
+
+        $this->assertTrue(file_exists('tmp'));
+        $this->assertTrue(is_dir('tmp'));
+        $this->assertTrue(is_writable('tmp'));
+        $this->assertFalse(file_exists('tmp/test-main-' . date('j.n.Y') . '.log'));
+        $this->assertFalse(file_exists('tmp/test-additional-' . date('j.n.Y') . '.log'));
+    }
+
+    public function testCreationMinMaxLogLevelsSkipUpper()
+    {
+        $channels = [
+            new Channel(
+                'test',
+                [
+                    new FileHandler('test-main', 'tmp', new SimpleLineFormatter()),
+                    new FileHandler('test-additional', 'tmp', new SimpleLineFormatter())
+                ],
+                LogLevel::INFO,
+                LogLevel::CRITICAL
+            )
+
+        ];
+
+        $logger = new Logger($channels);
+        $logger->debug("debug message");
+
+        $this->assertTrue(file_exists('tmp'));
+        $this->assertTrue(is_dir('tmp'));
+        $this->assertTrue(is_writable('tmp'));
+        $this->assertFalse(file_exists('tmp/test-main-' . date('j.n.Y') . '.log'));
+        $this->assertFalse(file_exists('tmp/test-additional-' . date('j.n.Y') . '.log'));
     }
 
     public function testLogWithErrorLogLevel()
