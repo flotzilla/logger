@@ -92,5 +92,74 @@ class ChannelTest extends TestCase
         $this->assertEquals('test name', $channel->getChannelName());
     }
 
-    // TODO finish this
+    public function testGetMinMaxLogLevel()
+    {
+        $c = new Channel('test-channel');
+        $this->assertEquals(LogLevel::DEBUG, $c->getMaxLogLevel());
+        $this->assertEquals(LogLevel::EMERGENCY, $c->getMinLogLevel());
+    }
+
+    public function testSetMaxLogLevel()
+    {
+        $c = new Channel('test-channel');
+        $this->assertEquals(LogLevel::DEBUG, $c->getMaxLogLevel());
+
+        $c->setMaxLogLevel(LogLevel::INFO);
+        $this->assertEquals(LogLevel::INFO, $c->getMaxLogLevel());
+    }
+
+    public function testSetMaxLogLevelTwice()
+    {
+        $c = new Channel('test-channel');
+        $this->assertEquals(LogLevel::DEBUG, $c->getMaxLogLevel());
+
+        $c->setMaxLogLevel(LogLevel::INFO);
+        $this->assertEquals(LogLevel::INFO, $c->getMaxLogLevel());
+
+        $c->setMaxLogLevel(LogLevel::ERROR);
+        $this->assertEquals(LogLevel::ERROR, $c->getMaxLogLevel());
+    }
+
+    public function testSetMaxLogLevelException()
+    {
+        $this->expectException(InvalidLogLevelException::class);
+        $this->expectExceptionMessage('Invalid some wrong level max level parameter');
+
+        $c = new Channel('test-channel');
+        $this->assertEquals(LogLevel::DEBUG, $c->getMaxLogLevel());
+
+        $c->setMaxLogLevel('some wrong level');
+    }
+
+    public function testSetMinLogLevel()
+    {
+        $c = new Channel('test-channel');
+        $this->assertEquals(LogLevel::EMERGENCY, $c->getMinLogLevel());
+
+        $c->setMinLogLevel(LogLevel::ERROR);
+        $this->assertEquals(LogLevel::ERROR, $c->getMinLogLevel());
+    }
+
+    public function testSetMinLogLevelTwice()
+    {
+        $c = new Channel('test-channel');
+        $this->assertEquals(LogLevel::EMERGENCY, $c->getMinLogLevel());
+
+        $c->setMinLogLevel(LogLevel::ERROR);
+        $this->assertEquals(LogLevel::ERROR, $c->getMinLogLevel());
+
+        $c->setMinLogLevel(LogLevel::INFO);
+        $this->assertEquals(LogLevel::INFO, $c->getMinLogLevel());
+    }
+
+    public function testSetMinLogLevelException()
+    {
+        $this->expectException(InvalidLogLevelException::class);
+        $this->expectExceptionMessage('Invalid some wrong level max level parameter');
+
+        $c = new Channel('test-channel');
+        $this->assertEquals(LogLevel::EMERGENCY, $c->getMinLogLevel());
+
+        $c->setMinLogLevel('some wrong level');
+    }
 }

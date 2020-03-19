@@ -23,6 +23,7 @@ class FileHandler implements HandlerInterface
      * @param string $handlerName
      * @param string $logDir
      * @param FormatterInterface|null $formatter
+     *
      * @throws InvalidConfigurationException
      */
     public function __construct(string $handlerName, string $logDir = "/tmp", FormatterInterface $formatter = null)

@@ -147,12 +147,10 @@ class Channel implements ChannelInterface, LoglevelInterface
     public function setMaxLogLevel(string $level)
     {
         if (!$this->isLogLevelValid($level)) {
-            throw new InvalidLogLevelException();
+            throw new InvalidLogLevelException("Invalid {$level} max level parameter");
         }
 
-        if ($this->maxLogLevelCheck($level, $this->maxLogLevel)) {
-            $this->maxLogLevel = strtolower($level);
-        }
+        $this->maxLogLevel = strtolower($level);
     }
 
     /**
@@ -161,12 +159,10 @@ class Channel implements ChannelInterface, LoglevelInterface
     public function setMinLogLevel(string $level): void
     {
         if (!$this->isLogLevelValid($level)) {
-            throw new InvalidLogLevelException();
+            throw new InvalidLogLevelException("Invalid {$level} max level parameter");
         }
 
-        if ($this->maxLogLevelCheck($level, $this->minLogLevel)) {
-            $this->minLogLevel = strtolower($level);
-        }
+        $this->minLogLevel = strtolower($level);
     }
 
     /**
