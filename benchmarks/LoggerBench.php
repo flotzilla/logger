@@ -7,8 +7,31 @@ use flotzilla\Logger\Formatter\SimpleLineFormatter;
 use flotzilla\Logger\Handler\FileHandler;
 use flotzilla\Logger\Logger;
 
+/**
+ * Class LoggerBench
+ * @BeforeMethods({"init"})
+ * @AfterClassMethods({"after"})
+ */
 class LoggerBench
 {
+    protected $logger;
+
+    public function init()
+    {
+        $channels = [
+            new Channel('test', [
+                new FileHandler('test-simple-line', 'tmp', new SimpleLineFormatter()),
+                new FileHandler('test-psr-formatter', 'tmp', new PsrFormatter())
+            ])
+        ];
+
+        $this->logger = new Logger($channels);
+    }
+    public static function after()
+    {
+        system("rm -rf " . escapeshellarg('tmp'));;
+    }
+
     /**
      * @Revs(5)
      * @Iterations(10)
@@ -16,29 +39,13 @@ class LoggerBench
      */
     public function benchLog()
     {
-        $channels = [
-            new Channel('test', [
-                new FileHandler('test-simple-line', 'tmp', new SimpleLineFormatter()),
-                new FileHandler('test-psr-formatter', 'tmp', new PsrFormatter())
-            ])
-        ];
-
-        $logger = new Logger($channels);
-        $logger->info('test message');
+        $this->logger->info('test message');
     }
 
     public function benchInsert()
     {
-        $channels = [
-            new Channel('test', [
-                new FileHandler('test-simple-line', 'tmp', new SimpleLineFormatter()),
-                new FileHandler('test-psr-formatter', 'tmp', new PsrFormatter())
-            ])
-        ];
-
-        $logger = new Logger($channels);
         foreach (range(0, 100000) as $iteration) {
-            $logger->info('test message' . rand($iteration));
+            $this->logger->info('test message' . rand($iteration));
         }
     }
 }
