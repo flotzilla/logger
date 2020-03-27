@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace flotzilla\Logger\Formatter;
 
+use flotzilla\Logger\LogLevel\LogLevel;
+
 class SimpleLineFormatter implements FormatterInterface
 {
     /** @var string $dataSeparatorStart */
@@ -23,15 +25,19 @@ class SimpleLineFormatter implements FormatterInterface
         $this->dataSeparatorEnd = $dataSeparatorEnd;
     }
 
-    public function format(array $record)
+    public function format(
+        string $message = '',
+        string $level = LogLevel::DEBUG,
+        string $date = '',
+        array $context = []
+    )
     {
-        $parsedContext = isset($record['context']) ? $this->parseContext($record['context']) : null;
+        $parsedContext = $context? $this->parseContext($context) : '';
 
-        return $this->dataSeparatorStart . $record['date'] . $this->dataSeparatorEnd
-        . $this->dataSeparatorStart . strtoupper($record['level']) . $this->dataSeparatorEnd
-        . $this->dataSeparatorStart . $record['source'] . $this->dataSeparatorEnd
-        . $this->dataSeparatorStart . $record['message'] . $this->dataSeparatorEnd
-        . ($parsedContext ? $this->dataSeparatorStart . $parsedContext . $this->dataSeparatorEnd : '') . PHP_EOL;
+        return $this->dataSeparatorStart . $date . $this->dataSeparatorEnd
+            . $this->dataSeparatorStart . strtoupper($level) . $this->dataSeparatorEnd
+            . $this->dataSeparatorStart . $message . $this->dataSeparatorEnd
+            . ($parsedContext ? $this->dataSeparatorStart . $parsedContext . $this->dataSeparatorEnd : '') . PHP_EOL;
     }
 
     /**

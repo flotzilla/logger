@@ -67,19 +67,24 @@ class Channel implements ChannelInterface, LoglevelInterface
     /**
      * @inheritDoc
      */
-    public function handle(array $record)
+    public function handle(
+        string $message = '',
+        string $level = LogLevel::DEBUG,
+        string $date = '',
+        array $context = []
+    )
     {
         if (!$this->enabled) {
             return;
         }
 
-        if (!$this->maxLogLevelCheck($record['level'], $this->maxLogLevel)
-            || !$this->minLogLevelCheck($record['level'], $this->minLogLevel)) {
+        if (!$this->maxLogLevelCheck($level, $this->maxLogLevel)
+            || !$this->minLogLevelCheck($level, $this->minLogLevel)) {
             return;
         }
 
         foreach ($this->handlers as $handler) {
-            $handler->handle($record);
+            $handler->handle($message, $level, $date, $context);
         }
     }
 

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace flotzilla\Logger\Channel;
 
 use flotzilla\Logger\Handler\HandlerInterface;
+use flotzilla\Logger\LogLevel\LogLevel;
 
 interface ChannelInterface
 {
@@ -31,7 +32,15 @@ interface ChannelInterface
     public function getChannelName(): string;
 
     /**
-     * @param array $record
+     * @param string $message
+     * @param string $level
+     * @param string $date
+     * @param array $context
      */
-    public function handle(array $record);
+    public function handle(
+        string $message = '',
+        string $level = LogLevel::DEBUG,
+        string $date = '',
+        array $context = []
+    );
 }

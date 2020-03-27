@@ -6,6 +6,7 @@ namespace flotzilla\Logger\Handler;
 
 use flotzilla\Logger\Exception\InvalidConfigurationException;
 use flotzilla\Logger\Formatter\FormatterInterface;
+use flotzilla\Logger\LogLevel\LogLevel;
 
 class FileHandler implements HandlerInterface
 {
@@ -42,18 +43,27 @@ class FileHandler implements HandlerInterface
     /**
      * Write record to file
      *
-     * @param array $record to be written. Array context should be standardised with implemented formatter
+     * @param string $message
+     * @param string $level
+     * @param string $date
+     * @param array $context
      * @return bool operation success status
      * @throws InvalidConfigurationException
      */
-    public function handle(array $record): bool
+    public function handle(
+        string $message = '',
+        string $level = LogLevel::DEBUG,
+        string $date = '',
+        array $context = []
+
+    ): bool
     {
         if (!$this->formatter) {
             throw new InvalidConfigurationException("Default Logger formatter is not initialized");
         }
 
         return $this->appendLog(
-            $this->formatter->format($record)
+            $this->formatter->format($message, $level, $date, $context)
         );
     }
 

@@ -56,15 +56,10 @@ class Logger implements LoggerInterface
         // TODO check if string or object have toString method
 
         // TODO date formatter
-        // TODO source
-        $record['level'] = $level;
-        $record['date'] = date('Y.j.m-h:i:s');
-        $record['source'] = 'test source'; //$_SERVER['REMOTE_ADDR']
-        $record['message'] = $message;
-        $record['context'] = $context;
+        $date = date('Y.j.m-h:i:s');
 
         foreach ($this->channels as $channel) {
-            $channel->handle($record);
+            $channel->handle($message, $level, $date, $context);
         }
     }
 
