@@ -42,10 +42,13 @@ class LoggerBench
         $this->logger->info('test message');
     }
 
+    /**
+     * @Iterations(5)
+     */
     public function benchInsert()
     {
         foreach (range(0, 100000) as $iteration) {
-            $this->logger->info('test message' . rand($iteration));
+            $this->logger->info('test message' . rand($iteration) . 21 . 'str');
         }
     }
 }
