@@ -35,7 +35,7 @@ class Logger implements LoggerInterface
      */
     public function __construct(array $channels = [], string $dateTimeFormat = 'Y.j.m-h:i:s.u', DateTimeZone $tz = null)
     {
-        if (!date($dateTimeFormat)){
+        if (!date($dateTimeFormat)) {
             throw new InvalidConfigurationException("Invalid date time format");
         }
 

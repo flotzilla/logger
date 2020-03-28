@@ -84,6 +84,7 @@ class Channel implements ChannelInterface, LoglevelInterface
         }
 
         foreach ($this->handlers as $handler) {
+            // TODO handle bool response
             $handler->handle($message, $level, $date, $context);
         }
     }

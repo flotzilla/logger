@@ -30,7 +30,7 @@ class SimpleLineFormatter implements FormatterInterface
         string $level = LogLevel::DEBUG,
         string $date = '',
         array $context = []
-    ) : string
+    ): string
     {
         $parsedContext = $context ? $this->parseContext($context) : '';
 
@@ -41,7 +41,7 @@ class SimpleLineFormatter implements FormatterInterface
     }
 
     /**
-     * @param array|string $context
+     * @param array $context
      * @return string
      */
     private function parseContext(array $context): string
@@ -75,7 +75,7 @@ class SimpleLineFormatter implements FormatterInterface
      *
      * Check if element can be converted to string
      *
-     * @param $lineElement
+     * @param mixed $lineElement
      * @return bool
      */
     private function isContextLineParsable($lineElement): bool
