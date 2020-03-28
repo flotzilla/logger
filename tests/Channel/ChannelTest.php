@@ -20,6 +20,12 @@ class ChannelTest extends TestCase
         $this->channel = new Channel('test-channel');
     }
 
+    protected function tearDown()
+    {
+        // remove all files from directory
+        system("rm -rf " . escapeshellarg('tmp'));;
+    }
+
     public function testIsEnabled()
     {
         $this->assertTrue($this->channel->isEnabled());
@@ -48,8 +54,8 @@ class ChannelTest extends TestCase
 
     public function testSetHandlers()
     {
-        $handler1 = new FileHandler('test-main', 'tmp', new SimpleLineFormatter());
-        $handler2 = new FileHandler('test-additional', 'tmp', new SimpleLineFormatter());
+        $handler1 = new FileHandler(new SimpleLineFormatter(), 'tmp', 'test-main');
+        $handler2 = new FileHandler(new SimpleLineFormatter(), 'tmp', 'test-additional');
         $handlers = [$handler1, $handler2];
         $this->channel->setHandlers($handlers);
         $this->assertCount(2, $this->channel->getHandlers());
@@ -59,8 +65,8 @@ class ChannelTest extends TestCase
 
     public function testAddHandlers()
     {
-        $handler1 = new FileHandler('test-main', 'tmp', new SimpleLineFormatter());
-        $handler2 = new FileHandler('test-additional', 'tmp', new SimpleLineFormatter());
+        $handler1 = new FileHandler(new SimpleLineFormatter(), 'tmp', 'test-main');
+        $handler2 = new FileHandler(new SimpleLineFormatter(), 'tmp', 'test-additional');
 
         $this->assertCount(0, $this->channel->getHandlers());
 
@@ -72,8 +78,8 @@ class ChannelTest extends TestCase
 
     public function testAddHandlerByName()
     {
-        $handler1 = new FileHandler('test-main', 'tmp', new SimpleLineFormatter());
-        $handler2 = new FileHandler('test-additional', 'tmp', new SimpleLineFormatter());
+        $handler1 = new FileHandler(new SimpleLineFormatter(), 'tmp', 'test-main');
+        $handler2 = new FileHandler(new SimpleLineFormatter(), 'tmp', 'test-additional');
 
         $this->assertCount(0, $this->channel->getHandlers());
 

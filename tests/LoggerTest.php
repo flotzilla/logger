@@ -22,8 +22,8 @@ class LoggerTest extends TestCase
     {
         $channels = [
             new Channel('test', [
-                new FileHandler('test-main', 'tmp', new SimpleLineFormatter()),
-                new FileHandler('test-additional', 'tmp', new SimpleLineFormatter())
+                new FileHandler(new SimpleLineFormatter(), 'tmp', 'test-main'),
+                new FileHandler(new SimpleLineFormatter(), 'tmp', 'test-additional')
             ])
         ];
 
@@ -44,8 +44,8 @@ class LoggerTest extends TestCase
             new Channel(
                 'test',
                 [
-                    new FileHandler('test-main', 'tmp', new SimpleLineFormatter()),
-                    new FileHandler('test-additional', 'tmp', new SimpleLineFormatter())
+                    new FileHandler(new SimpleLineFormatter(), 'tmp', 'test-main'),
+                    new FileHandler(new SimpleLineFormatter(), 'tmp', 'test-additional')
                 ],
                 LogLevel::DEBUG,
                 LogLevel::CRITICAL
@@ -69,8 +69,8 @@ class LoggerTest extends TestCase
             new Channel(
                 'test',
                 [
-                    new FileHandler('test-main', 'tmp', new SimpleLineFormatter()),
-                    new FileHandler('test-additional', 'tmp', new SimpleLineFormatter())
+                    new FileHandler(new SimpleLineFormatter(), 'tmp', 'test-main'),
+                    new FileHandler(new SimpleLineFormatter(), 'tmp', 'test-additional')
                 ],
                 LogLevel::DEBUG,
                 LogLevel::ALERT
@@ -94,8 +94,8 @@ class LoggerTest extends TestCase
             new Channel(
                 'test',
                 [
-                    new FileHandler('test-main', 'tmp', new SimpleLineFormatter()),
-                    new FileHandler('test-additional', 'tmp', new SimpleLineFormatter())
+                    new FileHandler(new SimpleLineFormatter(), 'tmp', 'test-main'),
+                    new FileHandler(new SimpleLineFormatter(), 'tmp', 'test-additional')
                 ],
                 LogLevel::INFO,
                 LogLevel::CRITICAL
@@ -118,8 +118,8 @@ class LoggerTest extends TestCase
         $channels = [
             new Channel(
                 'test', [
-                new FileHandler('test-main', 'tmp', new SimpleLineFormatter()),
-                new FileHandler('test-additional', 'tmp', new SimpleLineFormatter())
+                new FileHandler(new SimpleLineFormatter(), 'tmp', 'test-main'),
+                new FileHandler(new SimpleLineFormatter(), 'tmp', 'test-additional')
             ], LogLevel::ERROR)
         ];
 
@@ -138,8 +138,8 @@ class LoggerTest extends TestCase
         $channel = new Channel
         (
             'test', [
-            new FileHandler('test-main', 'tmp', new SimpleLineFormatter()),
-            new FileHandler('test-additional', 'tmp', new SimpleLineFormatter()),
+            new FileHandler(new SimpleLineFormatter(), 'tmp', 'test-main'),
+            new FileHandler(new SimpleLineFormatter(), 'tmp', 'test-additional')
         ], LogLevel::DEBUG
         );
 

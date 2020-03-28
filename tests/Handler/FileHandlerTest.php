@@ -18,14 +18,14 @@ class FileHandlerTest extends TestCase
 
     public function testDirectoryPermission()
     {
-        $handler = new FileHandler('test', 'logs', new SimpleLineFormatter());
+        $handler = new FileHandler(new SimpleLineFormatter(), 'logs', 'test');
 
         $this->assertTrue($handler->checkAvailability());
     }
 
     public function testDirectoryRecursivePermission()
     {
-        $handler = new FileHandler('test', 'logs/test', new SimpleLineFormatter());
+        $handler = new FileHandler(new SimpleLineFormatter(), 'logs/test', 'test');
 
         $this->assertTrue($handler->checkAvailability());
 
@@ -35,7 +35,7 @@ class FileHandlerTest extends TestCase
     public function testDirectoryAlreadyCreated()
     {
         mkdir('logs', 644);
-        $handler = new FileHandler('test', 'logs', new SimpleLineFormatter());
+        $handler = new FileHandler(new SimpleLineFormatter(), 'logs', 'test');
 
         $this->assertTrue($handler->checkAvailability());
     }
@@ -45,29 +45,19 @@ class FileHandlerTest extends TestCase
         $this->expectException(InvalidConfigurationException::class);
         $this->expectExceptionMessage('Logging directory is not exists or is not writable');
         mkdir('logs', 111);
-        $handler = new FileHandler('test', 'logs', new SimpleLineFormatter());
+        $handler = new FileHandler(new SimpleLineFormatter(), 'logs', 'test');
 
         $this->assertTrue($handler->checkAvailability());
-    }
-
-    public function testHandleEmptyFormatter()
-    {
-        $this->expectException(InvalidConfigurationException::class);
-        $this->expectExceptionMessage("Default Logger formatter is not initialized");
-
-        $handler = new FileHandler('test', 'logs');
-        $handler->handle([]);
     }
 
     public function testHandleSuccess()
     {
         $file = 'logs/test-' . date("j.n.Y") . '.log';
-        $handler = new FileHandler('test', 'logs', new TestFormatter);
-        $record = [ 'message' => 'test'];
+        $handler = new FileHandler(new TestFormatter, 'logs', 'test');
 
         $this->assertFalse(file_exists($file));
 
-        $handler->handle($record);
+        $handler->handle('test');
 
         $this->assertTrue(file_exists('logs'));
         $this->assertTrue(filesize($file) > 0);
@@ -76,12 +66,11 @@ class FileHandlerTest extends TestCase
     public function testHandleSanitise()
     {
         $file = 'logs/test-' . date("j.n.Y") . '.log';
-        $handler = new FileHandler('test', 'logs/', new TestFormatter);
-        $record = [ 'message' => 'test'];
+        $handler = new FileHandler(new TestFormatter, 'logs/', 'test');
 
         $this->assertFalse(file_exists($file));
 
-        $handler->handle($record);
+        $handler->handle('test');
 
         $this->assertTrue(file_exists('logs'));
         $this->assertTrue(filesize($file) > 0);
@@ -90,12 +79,11 @@ class FileHandlerTest extends TestCase
     public function testHandleSanitiseSubdir()
     {
         $file = 'logs/tmp/test-' . date("j.n.Y") . '.log';
-        $handler = new FileHandler('test', 'logs/tmp', new TestFormatter);
-        $record = [ 'message' => 'test'];
+        $handler = new FileHandler(new TestFormatter, 'logs/tmp', 'test');
 
         $this->assertFalse(file_exists($file));
 
-        $handler->handle($record);
+        $handler->handle('test');
 
         $this->assertTrue(file_exists('logs'));
         $this->assertTrue(filesize($file) > 0);
@@ -104,12 +92,11 @@ class FileHandlerTest extends TestCase
     public function testHandleSanitiseSubdirSlash()
     {
         $file = 'logs/tmp/test-' . date("j.n.Y") . '.log';
-        $handler = new FileHandler('test', 'logs/tmp/', new TestFormatter);
-        $record = [ 'message' => 'test'];
+        $handler = new FileHandler(new TestFormatter, 'logs/tmp', 'test');
 
         $this->assertFalse(file_exists($file));
 
-        $handler->handle($record);
+        $handler->handle('test');
 
         $this->assertTrue(file_exists('logs'));
         $this->assertTrue(filesize($file) > 0);
@@ -118,13 +105,12 @@ class FileHandlerTest extends TestCase
     public function testCorruptAppendLog()
     {
         $file = 'logs/test-' . date("j.n.Y") . '.log';
-        $handler = new FileHandler('test', 'logs', new TestFormatter);
-        $record = [ 'message' => 'test'];
+        $handler = new FileHandler(new TestFormatter, 'logs', 'test');
 
         $this->assertFalse(file_exists($file));
 
         system("rm -rf ".escapeshellarg('logs'));
-        $result = $handler->handle($record);
+        $result = $handler->handle('test');
         $this->assertFalse($result);
     }
 }
