@@ -11,33 +11,52 @@ use flotzilla\Logger\LogLevel\LogLevel;
 class FileHandler implements HandlerInterface
 {
     /** @var string $handlerName */
-    private $handlerName;
+    protected $handlerName;
+
+    /** @var string $fileNameDateFormat */
+    protected $fileNameDateFormat;
 
     /** @var string $logDir */
-    private $logDir;
+    protected $logDir;
 
     /** @var FormatterInterface $formatter */
     protected $formatter;
 
+    /** @var string $fileName */
+    protected $fileName;
+
     /**
      * FileHandler constructor.
-     * @param string $handlerName
-     * @param string $logDir
-     * @param FormatterInterface|null $formatter
-     *
+     * @param FormatterInterface $formatter
+     * @param string $logDir directory name for saving logs
+     * @param string $handlerName handler name for appending to file name
+     * @param string $fileNameDateFormat date() format arguments for appending to file name
      * @throws InvalidConfigurationException
      */
-    public function __construct(string $handlerName, string $logDir = "/tmp", FormatterInterface $formatter = null)
+    public function __construct(
+        FormatterInterface $formatter,
+        string $logDir = "/tmp",
+        string $handlerName = '',
+        string $fileNameDateFormat = 'j.n.Y'
+    )
     {
         $this->handlerName = $handlerName;
+        $this->fileNameDateFormat = $fileNameDateFormat;
         $this->logDir = $logDir;
         $this->formatter = $formatter;
+
+        if (!date($fileNameDateFormat)) {
+            throw new InvalidConfigurationException("Invalid date format");
+        }
 
         $this->makeLogDirectory();
 
         if (!$this->checkAvailability()) {
             throw new InvalidConfigurationException("Logging directory is not exists or is not writable");
         }
+
+        $this->fileName = $this->pathSanitise($this->logDir) . DIRECTORY_SEPARATOR
+            . ($this->handlerName ? $this->handlerName . '-' : '') . date($this->fileNameDateFormat) . '.log';
     }
 
     /**
@@ -100,14 +119,12 @@ class FileHandler implements HandlerInterface
     {
         $result = false;
 
-        if (!$this->checkAvailability()){
+        // directory permissions can be changed after initialization of this object
+        if (!$this->checkAvailability()) {
             return $result;
         }
 
-        $fileName = $this->pathSanitise($this->logDir) . DIRECTORY_SEPARATOR
-            . $this->handlerName . '-' . date("j.n.Y") . '.log';
-
-        if ($file = fopen($fileName, 'a')) {
+        if ($file = fopen($this->fileName, 'a')) {
             $result = fwrite($file, $log) !== false && fclose($file);
         }
 
@@ -122,12 +139,12 @@ class FileHandler implements HandlerInterface
      */
     private function pathSanitise(string $path): string
     {
-        if ($path === '/'){
+        if ($path === '/') {
             return $path;
         }
 
         // found slash at end
-        if (strpos($path, '/', strlen($path) - 1)){
+        if (strpos($path, '/', strlen($path) - 1)) {
             return substr($path, 0, strlen($path) - 1);
         }
 

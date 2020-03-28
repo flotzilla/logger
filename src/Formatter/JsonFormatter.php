@@ -13,7 +13,7 @@ class JsonFormatter implements FormatterInterface
         string $level = LogLevel::DEBUG,
         string $date = '',
         array $context = []
-    )
+    ) : string
     {
         // TODO implement more sophisticated approach
         return json_encode($message) . PHP_EOL;

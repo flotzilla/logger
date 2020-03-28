@@ -35,7 +35,6 @@ class LoggerBench
     /**
      * @Revs(5)
      * @Iterations(10)
-     * @throws \flotzilla\Logger\Exception\InvalidConfigurationException
      */
     public function benchLog()
     {

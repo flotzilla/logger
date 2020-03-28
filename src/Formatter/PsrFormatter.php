@@ -16,7 +16,7 @@ class PsrFormatter implements FormatterInterface
         string $level = LogLevel::DEBUG,
         string $date = '',
         array $context = []
-    )
+    ): string
     {
         $replace = [];
 

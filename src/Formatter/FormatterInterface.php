@@ -9,19 +9,18 @@ use flotzilla\Logger\LogLevel\LogLevel;
 interface FormatterInterface
 {
     /**
-     *
-     * This method implementation should contain
+     * Format log message and return string
      *
      * @param string $message
      * @param string $level
      * @param string $date
      * @param array $context
-     * @return mixed
+     * @return string
      */
     public function format(
         string $message = '',
         string $level = LogLevel::DEBUG,
         string $date = '',
         array $context = []
-    );
+    ): string;
 }
