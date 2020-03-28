@@ -9,7 +9,6 @@ use PHPUnit\Framework\TestCase;
 
 class LogLevelTraitTest extends TestCase
 {
-
     /**
      * @var MockObject
      */

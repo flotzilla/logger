@@ -67,19 +67,24 @@ class Channel implements ChannelInterface, LoglevelInterface
     /**
      * @inheritDoc
      */
-    public function handle(array $record)
+    public function handle(
+        string $message = '',
+        string $level = LogLevel::DEBUG,
+        string $date = '',
+        array $context = []
+    )
     {
         if (!$this->enabled) {
             return;
         }
 
-        if (!$this->maxLogLevelCheck($record['level'], $this->maxLogLevel)
-            || !$this->minLogLevelCheck($record['level'], $this->minLogLevel)) {
+        if (!$this->maxLogLevelCheck($level, $this->maxLogLevel)
+            || !$this->minLogLevelCheck($level, $this->minLogLevel)) {
             return;
         }
 
         foreach ($this->handlers as $handler) {
-            $handler->handle($record);
+            $handler->handle($message, $level, $date, $context);
         }
     }
 
@@ -147,12 +152,10 @@ class Channel implements ChannelInterface, LoglevelInterface
     public function setMaxLogLevel(string $level)
     {
         if (!$this->isLogLevelValid($level)) {
-            throw new InvalidLogLevelException();
+            throw new InvalidLogLevelException("Invalid {$level} max level parameter");
         }
 
-        if ($this->maxLogLevelCheck($level, $this->maxLogLevel)) {
-            $this->maxLogLevel = strtolower($level);
-        }
+        $this->maxLogLevel = strtolower($level);
     }
 
     /**
@@ -161,12 +164,10 @@ class Channel implements ChannelInterface, LoglevelInterface
     public function setMinLogLevel(string $level): void
     {
         if (!$this->isLogLevelValid($level)) {
-            throw new InvalidLogLevelException();
+            throw new InvalidLogLevelException("Invalid {$level} max level parameter");
         }
 
-        if ($this->maxLogLevelCheck($level, $this->minLogLevel)) {
-            $this->minLogLevel = strtolower($level);
-        }
+        $this->minLogLevel = strtolower($level);
     }
 
     /**

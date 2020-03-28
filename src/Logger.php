@@ -7,6 +7,7 @@ namespace flotzilla\Logger;
 use DateTimeZone;
 use Exception;
 use flotzilla\Logger\Channel\ChannelInterface;
+use flotzilla\Logger\Exception\InvalidConfigurationException;
 use flotzilla\Logger\Exception\InvalidLogLevelException;
 use flotzilla\Logger\LogLevel\LogLevel;
 use Psr\Log\LoggerInterface;
@@ -16,22 +17,30 @@ class Logger implements LoggerInterface
 {
     use LoggerTrait;
 
-    /**
-     * @var ChannelInterface[]
-     */
-    private $channels;
+    /** @var ChannelInterface[] */
+    protected $channels;
+
+    /** @var string $dateTimeFormat */
+    protected $dateTimeFormat;
 
     /** @var DateTimeZone $timeZone */
-    private $timeZone;
+    protected $timeZone;
 
     /**
      * Logger constructor.
      * @param ChannelInterface[] $channels
+     * @param string $dateTimeFormat that can be passed to date() or constant from DateTimeInterface
      * @param DateTimeZone|null $tz
+     * @throws InvalidConfigurationException
      */
-    public function __construct(array $channels = [], DateTimeZone $tz = null)
+    public function __construct(array $channels = [], string $dateTimeFormat = 'Y.j.m-h:i:s.u', DateTimeZone $tz = null)
     {
+        if (!date($dateTimeFormat)){
+            throw new InvalidConfigurationException("Invalid date time format");
+        }
+
         $this->channels = $channels;
+        $this->dateTimeFormat = $dateTimeFormat;
         $this->timeZone = $tz ?: new DateTimeZone(date_default_timezone_get());
     }
 
@@ -53,18 +62,10 @@ class Logger implements LoggerInterface
             throw new InvalidLogLevelException("{$level} Log level is not exists");
         }
 
-        // TODO check if string or object have toString method
-
-        // TODO date formatter
-        // TODO source
-        $record['level'] = $level;
-        $record['date'] = date('Y.j.m-h:i:s');
-        $record['source'] = 'test source'; //$_SERVER['REMOTE_ADDR']
-        $record['message'] = $message;
-        $record['context'] = $context;
+        $date = new \DateTimeImmutable('now', $this->timeZone);
 
         foreach ($this->channels as $channel) {
-            $channel->handle($record);
+            $channel->handle($message, $level, $date->format($this->dateTimeFormat), $context);
         }
     }
 
@@ -82,5 +83,21 @@ class Logger implements LoggerInterface
     public function setChannels(array $channels): void
     {
         $this->channels = $channels;
+    }
+
+    /**
+     * @return string
+     */
+    public function getDateTimeFormat(): string
+    {
+        return $this->dateTimeFormat;
+    }
+
+    /**
+     * @return DateTimeZone
+     */
+    public function getTimeZone(): DateTimeZone
+    {
+        return $this->timeZone;
     }
 }

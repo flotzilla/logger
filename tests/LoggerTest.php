@@ -3,6 +3,7 @@
 namespace flotzilla\Logger\Test;
 
 use flotzilla\Logger\Channel\Channel;
+use flotzilla\Logger\Exception\InvalidLogLevelException;
 use flotzilla\Logger\Formatter\SimpleLineFormatter;
 use flotzilla\Logger\Handler\FileHandler;
 use flotzilla\Logger\Logger;
@@ -21,8 +22,8 @@ class LoggerTest extends TestCase
     {
         $channels = [
             new Channel('test', [
-                new FileHandler('test-main', 'tmp', new SimpleLineFormatter()),
-                new FileHandler('test-additional', 'tmp', new SimpleLineFormatter())
+                new FileHandler(new SimpleLineFormatter(), 'tmp', 'test-main'),
+                new FileHandler(new SimpleLineFormatter(), 'tmp', 'test-additional')
             ])
         ];
 
@@ -43,8 +44,8 @@ class LoggerTest extends TestCase
             new Channel(
                 'test',
                 [
-                    new FileHandler('test-main', 'tmp', new SimpleLineFormatter()),
-                    new FileHandler('test-additional', 'tmp', new SimpleLineFormatter())
+                    new FileHandler(new SimpleLineFormatter(), 'tmp', 'test-main'),
+                    new FileHandler(new SimpleLineFormatter(), 'tmp', 'test-additional')
                 ],
                 LogLevel::DEBUG,
                 LogLevel::CRITICAL
@@ -68,8 +69,8 @@ class LoggerTest extends TestCase
             new Channel(
                 'test',
                 [
-                    new FileHandler('test-main', 'tmp', new SimpleLineFormatter()),
-                    new FileHandler('test-additional', 'tmp', new SimpleLineFormatter())
+                    new FileHandler(new SimpleLineFormatter(), 'tmp', 'test-main'),
+                    new FileHandler(new SimpleLineFormatter(), 'tmp', 'test-additional')
                 ],
                 LogLevel::DEBUG,
                 LogLevel::ALERT
@@ -93,8 +94,8 @@ class LoggerTest extends TestCase
             new Channel(
                 'test',
                 [
-                    new FileHandler('test-main', 'tmp', new SimpleLineFormatter()),
-                    new FileHandler('test-additional', 'tmp', new SimpleLineFormatter())
+                    new FileHandler(new SimpleLineFormatter(), 'tmp', 'test-main'),
+                    new FileHandler(new SimpleLineFormatter(), 'tmp', 'test-additional')
                 ],
                 LogLevel::INFO,
                 LogLevel::CRITICAL
@@ -117,8 +118,8 @@ class LoggerTest extends TestCase
         $channels = [
             new Channel(
                 'test', [
-                new FileHandler('test-main', 'tmp', new SimpleLineFormatter()),
-                new FileHandler('test-additional', 'tmp', new SimpleLineFormatter())
+                new FileHandler(new SimpleLineFormatter(), 'tmp', 'test-main'),
+                new FileHandler(new SimpleLineFormatter(), 'tmp', 'test-additional')
             ], LogLevel::ERROR)
         ];
 
@@ -137,8 +138,8 @@ class LoggerTest extends TestCase
         $channel = new Channel
         (
             'test', [
-            new FileHandler('test-main', 'tmp', new SimpleLineFormatter()),
-            new FileHandler('test-additional', 'tmp', new SimpleLineFormatter()),
+            new FileHandler(new SimpleLineFormatter(), 'tmp', 'test-main'),
+            new FileHandler(new SimpleLineFormatter(), 'tmp', 'test-additional')
         ], LogLevel::DEBUG
         );
 
@@ -155,6 +156,39 @@ class LoggerTest extends TestCase
         $this->assertFalse($channel->isEnabled());
         $this->assertFalse(file_exists('tmp/test-main-' . date('j.n.Y') . '.log'));
         $this->assertFalse(file_exists('tmp/test-additional-' . date('j.n.Y') . '.log'));
+    }
 
+    public function testWithWrongLevel()
+    {
+        $this->expectException(InvalidLogLevelException::class);
+        $this->expectExceptionMessage('some wrong level Log level is not exists');
+        $logger = new Logger();
+        $logger->log('some wrong level', 'test mess');
+    }
+
+    public function testGetEmptyChannels()
+    {
+        $logger = new Logger();
+        $this->assertCount(0, $logger->getChannels());
+    }
+
+    public function testGetChannels()
+    {
+        $logger = new Logger(
+            [
+                new Channel('test-channel')
+            ]
+        );
+        $this->assertCount(1, $logger->getChannels());
+    }
+
+    public function testGetChannelsFromSetter()
+    {
+        $channel = new Channel('test-channel');
+
+        $logger = new Logger();
+        $this->assertCount(0, $logger->getChannels());
+        $logger->setChannels([$channel]);
+        $this->assertCount(1, $logger->getChannels());
     }
 }

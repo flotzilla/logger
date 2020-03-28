@@ -18,7 +18,7 @@ trait LogLevelTrait
     /**
      * @param string $level
      * @param string $maxLevel
-     * @return mixed
+     * @return bool
      */
     public function maxLogLevelCheck(string $level, string $maxLevel): bool
     {
@@ -26,6 +26,11 @@ trait LogLevelTrait
             && LogLevel::LOG_LEVELS_INT[strtolower($level)] <= LogLevel::LOG_LEVELS_INT[$maxLevel];
     }
 
+    /**
+     * @param string $level
+     * @param string $minLevel
+     * @return bool
+     */
     public function minLogLevelCheck(string $level, string $minLevel): bool
     {
         return $this->isLogLevelValid($level) && $this->isLogLevelValid($minLevel)

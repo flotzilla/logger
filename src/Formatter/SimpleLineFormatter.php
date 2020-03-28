@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace flotzilla\Logger\Formatter;
 
+use flotzilla\Logger\LogLevel\LogLevel;
+
 class SimpleLineFormatter implements FormatterInterface
 {
     /** @var string $dataSeparatorStart */
@@ -23,51 +25,62 @@ class SimpleLineFormatter implements FormatterInterface
         $this->dataSeparatorEnd = $dataSeparatorEnd;
     }
 
-    public function format(array $record)
+    public function format(
+        string $message = '',
+        string $level = LogLevel::DEBUG,
+        string $date = '',
+        array $context = []
+    ) : string
     {
-        $parsedContext = isset($record['context']) ? $this->parseContext($record['context']) : null;
+        $parsedContext = $context ? $this->parseContext($context) : '';
 
-        return $this->dataSeparatorStart . $record['date'] . $this->dataSeparatorEnd
-        . $this->dataSeparatorStart . strtoupper($record['level']) . $this->dataSeparatorEnd
-        . $this->dataSeparatorStart . $record['source'] . $this->dataSeparatorEnd
-        . $this->dataSeparatorStart . $record['message'] . $this->dataSeparatorEnd
-        . ($parsedContext ? $this->dataSeparatorStart . $parsedContext . $this->dataSeparatorEnd : '') . PHP_EOL;
+        return $this->dataSeparatorStart . $date . $this->dataSeparatorEnd
+            . $this->dataSeparatorStart . strtoupper($level) . $this->dataSeparatorEnd
+            . $this->dataSeparatorStart . $message . $this->dataSeparatorEnd
+            . ($parsedContext ? $this->dataSeparatorStart . $parsedContext . $this->dataSeparatorEnd : '') . PHP_EOL;
     }
 
     /**
      * @param array|string $context
      * @return string
      */
-    private function parseContext($context)
+    private function parseContext(array $context): string
     {
         $parsedContext = '';
 
-        if (is_array($context)) {
+        $count = count($context);
+        if ($count == 0) {
+            return $parsedContext;
+        }
 
-            $count = count($context);
-            if ($count == 0) {
-                return $parsedContext;
-            }
-
-            // check if context array have associative keys
-            if (array_keys($context) !== range(0, $count - 1)) {
-                foreach ($context as $elementK => $elementV) {
+        // check if context array have associative keys
+        if (array_keys($context) !== range(0, $count - 1)) {
+            foreach ($context as $elementK => $elementV) {
+                if ($this->isContextLineParsable($elementV)) {
                     $parsedContext .= $this->dataSeparatorStart . $elementK . '=' . $elementV . $this->dataSeparatorEnd;
                 }
-            } else {
-                foreach ($context as $contextEl) {
+            }
+        } else {
+            foreach ($context as $contextEl) {
+                if ($this->isContextLineParsable($contextEl)) {
                     $parsedContext .= $this->dataSeparatorStart . $contextEl . $this->dataSeparatorEnd;
                 }
             }
-        } else if (is_string($context)) {
-
-            if ($context) {
-                $parsedContext = $this->dataSeparatorStart . $context . $this->dataSeparatorEnd;
-            }
-        } else {
-            // TODO handle
         }
 
         return $parsedContext;
+    }
+
+    /**
+     *
+     * Check if element can be converted to string
+     *
+     * @param $lineElement
+     * @return bool
+     */
+    private function isContextLineParsable($lineElement): bool
+    {
+        return !is_array($lineElement) && !is_resource($lineElement)
+            && (!is_object($lineElement) || method_exists($lineElement, '__toString'));
     }
 }

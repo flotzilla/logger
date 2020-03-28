@@ -11,19 +11,23 @@ class PsrFormatter implements FormatterInterface
     /**
      * @inheritDoc
      */
-    public function format(array $record)
+    public function format(
+        string $message = '',
+        string $level = LogLevel::DEBUG,
+        string $date = '',
+        array $context = []
+    ): string
     {
         $replace = [];
-        $message = $record['message'];
 
-        foreach ($record['context'] as $contextK => $contextV) {
+        foreach ($context as $contextK => $contextV) {
             if (!is_array($contextV) && (!is_object($contextV) || method_exists($contextV, '__toString'))) {
                 $replace['{' . $contextK . '}'] = $contextV;
             }
         }
 
         if ($replace) {
-            $message = strtr($record['message'], $replace);
+            $message = strtr($message, $replace);
         }
 
         return $message . PHP_EOL;

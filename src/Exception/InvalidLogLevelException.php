@@ -1,8 +1,8 @@
 <?php
 
+declare(strict_types=1);
 
 namespace flotzilla\Logger\Exception;
-
 
 use Psr\Log\InvalidArgumentException;
 use Throwable;
