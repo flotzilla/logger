@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace flotzilla\Logger\Handler;
 
-use DateTime;
 use flotzilla\Logger\Exception\InvalidConfigurationException;
 use flotzilla\Logger\Formatter\FormatterInterface;
 use flotzilla\Logger\Helper\Helper;
