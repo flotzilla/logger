@@ -9,20 +9,35 @@ use flotzilla\Logger\LogLevel\LogLevel;
 class SimpleLineFormatter implements FormatterInterface
 {
     /** @var string $dataSeparatorStart */
-    protected $dataSeparatorStart = "[";
+    protected $dataSeparatorStart;
 
     /** @var string $dataSeparatorEnd */
-    protected $dataSeparatorEnd = "]";
+    protected $dataSeparatorEnd;
+
+    /** @var string $contextSeparatorStart */
+    protected $contextSeparatorStart;
+
+    /** @var string */
+    protected $contextSeparatorEnd;
 
     /**
      * SimpleFormatter constructor.
      * @param string $dataSeparatorStart
      * @param string $dataSeparatorEnd
+     * @param string $contextSeparatorStart
+     * @param string $contextSeparatorEnd
      */
-    public function __construct(string $dataSeparatorStart = "[", string $dataSeparatorEnd = "]")
+    public function __construct(
+        string $dataSeparatorStart = '[',
+        string $dataSeparatorEnd = ']',
+        string $contextSeparatorStart = '{',
+        string $contextSeparatorEnd = '}'
+    )
     {
         $this->dataSeparatorStart = $dataSeparatorStart;
         $this->dataSeparatorEnd = $dataSeparatorEnd;
+        $this->contextSeparatorStart = $contextSeparatorStart;
+        $this->contextSeparatorEnd = $contextSeparatorEnd;
     }
 
     public function format(
@@ -57,13 +72,13 @@ class SimpleLineFormatter implements FormatterInterface
         if (array_keys($context) !== range(0, $count - 1)) {
             foreach ($context as $elementK => $elementV) {
                 if ($this->isContextLineParsable($elementV)) {
-                    $parsedContext .= $this->dataSeparatorStart . $elementK . '=' . $elementV . $this->dataSeparatorEnd;
+                    $parsedContext .= $this->contextSeparatorStart . $elementK . '=' . $elementV . $this->contextSeparatorEnd;
                 }
             }
         } else {
             foreach ($context as $contextEl) {
                 if ($this->isContextLineParsable($contextEl)) {
-                    $parsedContext .= $this->dataSeparatorStart . $contextEl . $this->dataSeparatorEnd;
+                    $parsedContext .= $this->contextSeparatorStart . $contextEl . $this->contextSeparatorEnd;
                 }
             }
         }

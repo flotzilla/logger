@@ -3,7 +3,9 @@
 namespace flotzilla\Logger\Test;
 
 use flotzilla\Logger\Channel\Channel;
+use flotzilla\Logger\Exception\InvalidConfigurationException;
 use flotzilla\Logger\Exception\InvalidLogLevelException;
+use flotzilla\Logger\Formatter\PsrFormatter;
 use flotzilla\Logger\Formatter\SimpleLineFormatter;
 use flotzilla\Logger\Handler\FileHandler;
 use flotzilla\Logger\Logger;
@@ -35,7 +37,30 @@ class LoggerTest extends TestCase
         $this->assertTrue(is_writable('tmp'));
         $this->assertTrue(file_exists('tmp/test-main-' . date('j.n.Y') . '.log'));
         $this->assertTrue(file_exists('tmp/test-additional-' . date('j.n.Y') . '.log'));
+    }
 
+    public function testLogWithContext()
+    {
+        $channels = [
+            new Channel('test', [
+                new FileHandler(new PsrFormatter(), 'tmp', 'test-main'),
+                new FileHandler(new SimpleLineFormatter(), 'tmp', 'test-additional')
+            ])
+        ];
+
+        $logger = new Logger($channels);
+
+        $testObj = new TestClass();
+        $logger->info("debug message", ['some var']);
+        $logger->info("debug message", ['key' => 'val', 'key1' => 'val1']);
+        $logger->info("debug message", ['key' => 'val', [], new \stdClass()]);
+        $logger->info("debug message", [$testObj]);
+
+        $this->assertTrue(file_exists('tmp'));
+        $this->assertTrue(is_dir('tmp'));
+        $this->assertTrue(is_writable('tmp'));
+        $this->assertTrue(file_exists('tmp/test-main-' . date('j.n.Y') . '.log'));
+        $this->assertTrue(file_exists('tmp/test-additional-' . date('j.n.Y') . '.log'));
     }
 
     public function testCreationMinMaxLogLevels()
@@ -190,5 +215,19 @@ class LoggerTest extends TestCase
         $this->assertCount(0, $logger->getChannels());
         $logger->setChannels([$channel]);
         $this->assertCount(1, $logger->getChannels());
+    }
+
+    public function testInvalidDateFormat()
+    {
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage('Invalid date time format');
+        $channel = new Channel('test-channel');
+
+        $logger = new Logger(
+            [
+                $channel
+            ],
+            'wrong dateTime format'
+        );
     }
 }
