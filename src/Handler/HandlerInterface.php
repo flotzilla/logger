@@ -10,15 +10,15 @@ interface HandlerInterface
 {
     /**
      * @param string $message
+     * @param array $context
      * @param string $level
      * @param string $date
-     * @param array $context
      * @return bool
      */
     public function handle(
         string $message = '',
+        array $context = [],
         string $level = LogLevel::DEBUG,
-        string $date = '',
-        array $context = []
+        string $date = ''
     ): bool;
 }

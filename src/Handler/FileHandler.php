@@ -64,18 +64,17 @@ class FileHandler implements HandlerInterface
      * Write record to file
      *
      * @param string $message
+     * @param array $context
      * @param string $level
      * @param string $date
-     * @param array $context
      * @return bool operation success status
      * @throws InvalidConfigurationException
      */
     public function handle(
         string $message = '',
+        array $context = [],
         string $level = LogLevel::DEBUG,
-        string $date = '',
-        array $context = []
-
+        string $date = ''
     ): bool
     {
         if (!$this->formatter) {
@@ -83,7 +82,7 @@ class FileHandler implements HandlerInterface
         }
 
         return $this->appendLog(
-            $this->formatter->format($message, $level, $date, $context)
+            $this->formatter->format($message, $context, $level, $date) . PHP_EOL
         );
     }
 

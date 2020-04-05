@@ -9,13 +9,20 @@ use flotzilla\Logger\LogLevel\LogLevel;
 class PsrFormatter implements FormatterInterface
 {
     /**
-     * @inheritDoc
+     * String implementation of PSR logging interface, with skipped values of log level and date
+     *
+     * @param string $message
+     * @param array $context
+     * @param string $level skipped parameter
+     * @param string $date skipped parameter
+     *
+     * @return string result string
      */
     public function format(
         string $message = '',
+        array $context = [],
         string $level = LogLevel::DEBUG,
-        string $date = '',
-        array $context = []
+        string $date = ''
     ): string
     {
         $replace = [];
@@ -30,6 +37,6 @@ class PsrFormatter implements FormatterInterface
             $message = strtr($message, $replace);
         }
 
-        return $message . PHP_EOL;
+        return $message;
     }
 }

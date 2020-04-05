@@ -67,7 +67,7 @@ class Logger implements LoggerInterface
 
         // TODO add exception handler
         foreach ($this->channels as $channel) {
-            $channel->handle($message, $level, $date->format($this->dateTimeFormat), $context);
+            $channel->handle($message, $context, $level, $date->format($this->dateTimeFormat));
         }
     }
 

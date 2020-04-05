@@ -42,9 +42,9 @@ class SimpleLineFormatter implements FormatterInterface
 
     public function format(
         string $message = '',
+        array $context = [],
         string $level = LogLevel::DEBUG,
-        string $date = '',
-        array $context = []
+        string $date = ''
     ): string
     {
         $parsedContext = $context ? $this->parseContext($context) : '';
@@ -52,7 +52,7 @@ class SimpleLineFormatter implements FormatterInterface
         return $this->dataSeparatorStart . $date . $this->dataSeparatorEnd
             . $this->dataSeparatorStart . strtoupper($level) . $this->dataSeparatorEnd
             . $this->dataSeparatorStart . $message . $this->dataSeparatorEnd
-            . ($parsedContext ? $this->dataSeparatorStart . $parsedContext . $this->dataSeparatorEnd : '') . PHP_EOL;
+            . ($parsedContext ? $this->dataSeparatorStart . $parsedContext . $this->dataSeparatorEnd : '');
     }
 
     /**

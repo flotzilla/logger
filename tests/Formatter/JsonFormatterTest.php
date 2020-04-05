@@ -43,8 +43,8 @@ class JsonFormatterTest extends TestCase
             ]
         ];
 
-        $formattedRecord = $this->formatter->format('Test message', LogLevel::INFO, date('Y-m-d H:i:s'));
-        $formattedRecord .= $this->formatter->format('Test message 2', LogLevel::INFO, date('Y-m-d H:i:s'), [
+        $formattedRecord = $this->formatter->format('Test message', [],LogLevel::INFO, date('Y-m-d H:i:s'));
+        $formattedRecord .= $this->formatter->format('Test message 2', [],LogLevel::INFO, date('Y-m-d H:i:s'), [
                 'some additional data' => 123,
                 'some additional data2' => 321,
             ]

@@ -19,8 +19,8 @@ interface FormatterInterface
      */
     public function format(
         string $message = '',
+        array $context = [],
         string $level = LogLevel::DEBUG,
-        string $date = '',
-        array $context = []
+        string $date = ''
     ): string;
 }
