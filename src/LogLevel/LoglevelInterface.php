@@ -12,11 +12,11 @@ interface LoglevelInterface
      * Should throw exception in attempt to set invalid log level
      *
      * @param string $level
-     * @return mixed
+     * @return void
      *
      * @throws InvalidLogLevelException
      */
-    public function setMaxLogLevel(string $level);
+    public function setMaxLogLevel(string $level): void;
 
     /**
      * @return string
@@ -25,7 +25,7 @@ interface LoglevelInterface
 
     /**
      * @param string $level
-     * @return mixed
+     * @return void
      *
      * @throws InvalidLogLevelException
      */

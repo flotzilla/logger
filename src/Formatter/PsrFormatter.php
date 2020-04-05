@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace flotzilla\Logger\Formatter;
 
+use flotzilla\Logger\Helper\Helper;
 use flotzilla\Logger\LogLevel\LogLevel;
 
 class PsrFormatter implements FormatterInterface
@@ -28,7 +29,7 @@ class PsrFormatter implements FormatterInterface
         $replace = [];
 
         foreach ($context as $contextK => $contextV) {
-            if (!is_array($contextV) && (!is_object($contextV) || method_exists($contextV, '__toString'))) {
+            if (Helper::checkIsLineParsable($contextV)) {
                 $replace['{' . $contextK . '}'] = $contextV;
             }
         }

@@ -150,7 +150,7 @@ class Channel implements ChannelInterface, LoglevelInterface
     /**
      * @inheritDoc
      */
-    public function setMaxLogLevel(string $level)
+    public function setMaxLogLevel(string $level): void
     {
         if (!$this->isLogLevelValid($level)) {
             throw new InvalidLogLevelException("Invalid {$level} max level parameter");

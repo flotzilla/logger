@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace flotzilla\Logger\Formatter;
 
+use flotzilla\Logger\Helper\Helper;
 use flotzilla\Logger\LogLevel\LogLevel;
 
 class SimpleLineFormatter implements FormatterInterface
@@ -71,31 +72,18 @@ class SimpleLineFormatter implements FormatterInterface
         // check if context array have associative keys
         if (array_keys($context) !== range(0, $count - 1)) {
             foreach ($context as $elementK => $elementV) {
-                if ($this->isContextLineParsable($elementV)) {
+                if (Helper::checkIsLineParsable($elementV)) {
                     $parsedContext .= $this->contextSeparatorStart . $elementK . '=' . $elementV . $this->contextSeparatorEnd;
                 }
             }
         } else {
             foreach ($context as $contextEl) {
-                if ($this->isContextLineParsable($contextEl)) {
+                if (Helper::checkIsLineParsable($contextEl)) {
                     $parsedContext .= $this->contextSeparatorStart . $contextEl . $this->contextSeparatorEnd;
                 }
             }
         }
 
         return $parsedContext;
-    }
-
-    /**
-     *
-     * Check if element can be converted to string
-     *
-     * @param mixed $lineElement
-     * @return bool
-     */
-    private function isContextLineParsable($lineElement): bool
-    {
-        return !is_array($lineElement) && !is_resource($lineElement)
-            && (!is_object($lineElement) || method_exists($lineElement, '__toString'));
     }
 }
