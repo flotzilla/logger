@@ -9,6 +9,7 @@ use Exception;
 use flotzilla\Logger\Channel\ChannelInterface;
 use flotzilla\Logger\Exception\InvalidConfigurationException;
 use flotzilla\Logger\Exception\InvalidLogLevelException;
+use flotzilla\Logger\Helper\Helper;
 use flotzilla\Logger\LogLevel\LogLevel;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LoggerTrait;
@@ -35,8 +36,8 @@ class Logger implements LoggerInterface
      */
     public function __construct(array $channels = [], string $dateTimeFormat = 'Y.j.m-h:i:s.u', DateTimeZone $tz = null)
     {
-        if (!date($dateTimeFormat)) {
-            throw new InvalidConfigurationException("Invalid date time format");
+        if (!Helper::isTimeFormatValid($dateTimeFormat)) {
+            throw new InvalidConfigurationException('Invalid date time format');
         }
 
         $this->channels = $channels;
@@ -64,8 +65,9 @@ class Logger implements LoggerInterface
 
         $date = new \DateTimeImmutable('now', $this->timeZone);
 
+        // TODO add exception handler
         foreach ($this->channels as $channel) {
-            $channel->handle($message, $level, $date->format($this->dateTimeFormat), $context);
+            $channel->handle($message, $context, $level, $date->format($this->dateTimeFormat));
         }
     }
 

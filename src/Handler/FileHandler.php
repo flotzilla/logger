@@ -6,6 +6,7 @@ namespace flotzilla\Logger\Handler;
 
 use flotzilla\Logger\Exception\InvalidConfigurationException;
 use flotzilla\Logger\Formatter\FormatterInterface;
+use flotzilla\Logger\Helper\Helper;
 use flotzilla\Logger\LogLevel\LogLevel;
 
 class FileHandler implements HandlerInterface
@@ -35,24 +36,24 @@ class FileHandler implements HandlerInterface
      */
     public function __construct(
         FormatterInterface $formatter,
-        string $logDir = "/tmp",
+        string $logDir = '/tmp',
         string $handlerName = '',
         string $fileNameDateFormat = 'j.n.Y'
     )
     {
+        if (!Helper::isTimeFormatValid($fileNameDateFormat)) {
+            throw new InvalidConfigurationException('Invalid datetime format');
+        }
+
         $this->handlerName = $handlerName;
         $this->fileNameDateFormat = $fileNameDateFormat;
         $this->logDir = $logDir;
         $this->formatter = $formatter;
 
-        if (!date($fileNameDateFormat)) {
-            throw new InvalidConfigurationException("Invalid date format");
-        }
-
         $this->makeLogDirectory();
 
         if (!$this->checkAvailability()) {
-            throw new InvalidConfigurationException("Logging directory is not exists or is not writable");
+            throw new InvalidConfigurationException('Logging directory is not exists or is not writable');
         }
 
         $this->fileName = $this->pathSanitise($this->logDir) . DIRECTORY_SEPARATOR
@@ -63,26 +64,25 @@ class FileHandler implements HandlerInterface
      * Write record to file
      *
      * @param string $message
+     * @param array $context
      * @param string $level
      * @param string $date
-     * @param array $context
      * @return bool operation success status
      * @throws InvalidConfigurationException
      */
     public function handle(
         string $message = '',
+        array $context = [],
         string $level = LogLevel::DEBUG,
-        string $date = '',
-        array $context = []
-
+        string $date = ''
     ): bool
     {
         if (!$this->formatter) {
-            throw new InvalidConfigurationException("Default Logger formatter is not initialized");
+            throw new InvalidConfigurationException('Default Logger formatter is not initialized');
         }
 
         return $this->appendLog(
-            $this->formatter->format($message, $level, $date, $context)
+            $this->formatter->format($message, $context, $level, $date) . PHP_EOL
         );
     }
 

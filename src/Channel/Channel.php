@@ -69,9 +69,9 @@ class Channel implements ChannelInterface, LoglevelInterface
      */
     public function handle(
         string $message = '',
+        array $context = [],
         string $level = LogLevel::DEBUG,
-        string $date = '',
-        array $context = []
+        string $date = ''
     )
     {
         if (!$this->enabled) {
@@ -85,7 +85,7 @@ class Channel implements ChannelInterface, LoglevelInterface
 
         foreach ($this->handlers as $handler) {
             // TODO handle bool response
-            $handler->handle($message, $level, $date, $context);
+            $handler->handle($message, $context, $level, $date);
         }
     }
 

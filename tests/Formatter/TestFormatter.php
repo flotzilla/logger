@@ -11,11 +11,11 @@ class TestFormatter implements FormatterInterface
 {
 
     public function format(string $message = '',
+                           array $context = [],
                            string $level = LogLevel::DEBUG,
-                           string $date = '',
-                           array $context = []
-    ) : string
+                           string $date = ''
+    ): string
     {
-        return $message . ' | ' .  $level . ' | ' . $date;
+        return $message . ' | ' . $level . ' | ' . $date;
     }
 }
