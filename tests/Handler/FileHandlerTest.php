@@ -118,6 +118,6 @@ class FileHandlerTest extends TestCase
     {
         $this->expectException(InvalidConfigurationException::class);
         $this->expectExceptionMessage('Invalid datetime format');
-        $handler = new FileHandler(new TestFormatter, 'logs', 'test', 'someDateTime');
+        new FileHandler(new TestFormatter, 'logs', 'test', 'someDateTime');
     }
 }

@@ -68,7 +68,6 @@ class FileHandler implements HandlerInterface
      * @param string $level
      * @param string $date
      * @return bool operation success status
-     * @throws InvalidConfigurationException
      */
     public function handle(
         string $message = '',
@@ -77,10 +76,6 @@ class FileHandler implements HandlerInterface
         string $date = ''
     ): bool
     {
-        if (!$this->formatter) {
-            throw new InvalidConfigurationException('Default Logger formatter is not initialized');
-        }
-
         return $this->appendLog(
             $this->formatter->format($message, $context, $level, $date) . PHP_EOL
         );

@@ -13,7 +13,6 @@ class PsrFormatterTest extends TestCase
      */
     protected $formatter;
 
-
     protected function setUp()
     {
         $this->formatter = new PsrFormatter();
