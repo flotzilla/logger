@@ -5,7 +5,7 @@ Simple PSR-3 logger interface implementation with huge influence of monolog
 
 ## Requirements
 
-`php > 7.1`
+`php > 7.3`
 
 ## Install
 via Composer

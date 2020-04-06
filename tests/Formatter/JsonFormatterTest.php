@@ -18,14 +18,11 @@ class JsonFormatterTest extends TestCase
         $this->formatter = new JsonFormatter();
     }
 
-    /**
-     * @skipTest
-     */
     public function testFormat()
     {
-        $this->markTestIncomplete(
-            'This test has not been implemented yet.'
-        );
+//        $this->markTestIncomplete(
+//            'This test has not been implemented yet.'
+//        );
 
         $record = [
             'message' => 'Test message',
@@ -43,15 +40,19 @@ class JsonFormatterTest extends TestCase
             ]
         ];
 
-        $formattedRecord = $this->formatter->format('Test message', [],LogLevel::INFO, date('Y-m-d H:i:s'));
-        $formattedRecord .= $this->formatter->format('Test message 2', [],LogLevel::INFO, date('Y-m-d H:i:s'), [
+        $formattedRecord = $this->formatter->format('Test message', [], LogLevel::INFO, date('Y-m-d H:i:s'));
+        $formattedRecord .= $this->formatter->format(
+            'Test message 2',
+            [
                 'some additional data' => 123,
                 'some additional data2' => 321,
-            ]
+            ],
+            LogLevel::INFO,
+            date('Y-m-d H:i:s')
         );
 
         $expected = json_encode($record) . PHP_EOL
-            .  json_encode($record2) . PHP_EOL;
+            . json_encode($record2) . PHP_EOL;
 
         $this->assertEquals($expected, $formattedRecord);
     }
