@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace flotzilla\Logger\Channel;
 
+use flotzilla\Logger\Exception\FormatterException;
+use flotzilla\Logger\Exception\HandlerException;
 use flotzilla\Logger\Exception\InvalidLogLevelException;
 use flotzilla\Logger\LogLevel\LogLevel;
 use flotzilla\Logger\LogLevel\LoglevelInterface;
@@ -74,19 +76,28 @@ class Channel implements ChannelInterface, LoglevelInterface
         string $date = ''
     )
     {
+        $errors = [];
+        $isSuccess = true;
+
         if (!$this->enabled) {
-            return;
+            return $isSuccess;
         }
 
         if (!$this->maxLogLevelCheck($level, $this->maxLogLevel)
             || !$this->minLogLevelCheck($level, $this->minLogLevel)) {
-            return;
+            return $isSuccess;
         }
 
         foreach ($this->handlers as $handler) {
-            // TODO handle bool response
-            $handler->handle($message, $context, $level, $date);
+            try {
+                $isSuccess &= $handler->handle($message, $context, $level, $date);
+            } catch (HandlerException | FormatterException $e) {
+                $errors[] = $e;
+                continue;
+            }
         }
+
+        return $errors ?: $isSuccess;
     }
 
     /**

@@ -4,9 +4,12 @@ declare(strict_types=1);
 
 namespace flotzilla\Logger;
 
+use DateTimeImmutable;
 use DateTimeZone;
 use Exception;
 use flotzilla\Logger\Channel\ChannelInterface;
+use flotzilla\Logger\Exception\FormatterException;
+use flotzilla\Logger\Exception\HandlerException;
 use flotzilla\Logger\Exception\InvalidConfigurationException;
 use flotzilla\Logger\Exception\InvalidLogLevelException;
 use flotzilla\Logger\Helper\Helper;
@@ -26,6 +29,9 @@ class Logger implements LoggerInterface
 
     /** @var DateTimeZone $timeZone */
     protected $timeZone;
+
+    // TODO fix this
+    protected $errorHandler;
 
     /**
      * Logger constructor.
@@ -48,26 +54,62 @@ class Logger implements LoggerInterface
     /**
      * Logs with an arbitrary level.
      *
-     * @param mixed $level
-     * @param string $message
-     * @param array $context
+     * @param mixed $level LogLevel formats
+     * @param string $message message to log
+     * @param array $context additional data
      *
      * @return void
      *
-     * @throws InvalidLogLevelException
-     * @throws Exception
+     * Throw errors if no any error handler was provided.
+     * @throws FormatterException in case of formatting issues, e.g. parsing invalid json
+     * @throws HandlerException in case of handler error, e.g file write exception
+     * @throws InvalidLogLevelException in case of wrong level format
+     * @throws Exception cause of DateTimeImmutable creation
+     * @see LogLevel for correct log formats
+     *
      */
     public function log($level, $message, array $context = [])
     {
-        if (!in_array(strtolower($level), LogLevel::LOG_LEVELS)) {
-            throw new InvalidLogLevelException("{$level} Log level is not exists");
+        try {
+            if (!in_array(strtolower($level), LogLevel::LOG_LEVELS)) {
+                throw new InvalidLogLevelException("{$level} Log level is not exist");
+            }
+
+            $date = new DateTimeImmutable('now', $this->timeZone);
+        } catch (InvalidLogLevelException | Exception $e) {
+            $this->handleErrors([$e]);
         }
 
-        $date = new \DateTimeImmutable('now', $this->timeZone);
-
-        // TODO add exception handler
+        $errors = [];
+        //TODO date check
         foreach ($this->channels as $channel) {
-            $channel->handle($message, $context, $level, $date->format($this->dateTimeFormat));
+            $response = $channel->handle($message, $context, $level, $date->format($this->dateTimeFormat));
+
+            // TODO handle errors from each channel
+            if (!$response && is_array($response)) {
+                array_merge($errors, $response);
+            }
+        }
+
+        if ($errors){
+            $this->handleErrors($errors);
+        }
+
+    }
+
+    /**
+     * @param array $errors
+     * @throws Exception
+     */
+    public function handleErrors(array $errors)
+    {
+        foreach ($errors as $error) {
+            if ($this->errorHandler) {
+                $this->errorHandler->handle($error);
+            } else {
+                // TODO whoa! what we got here?
+                throw $error;
+            }
         }
     }
 
@@ -101,5 +143,21 @@ class Logger implements LoggerInterface
     public function getTimeZone(): DateTimeZone
     {
         return $this->timeZone;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getErrorHandler()
+    {
+        return $this->errorHandler;
+    }
+
+    /**
+     * @param mixed $errorHandler
+     */
+    public function setErrorHandler($errorHandler): void
+    {
+        $this->errorHandler = $errorHandler;
     }
 }

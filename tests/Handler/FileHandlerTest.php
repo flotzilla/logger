@@ -43,7 +43,7 @@ class FileHandlerTest extends TestCase
     public function testDirectoryPermissionError()
     {
         $this->expectException(InvalidConfigurationException::class);
-        $this->expectExceptionMessage('Logging directory is not exists or is not writable');
+        $this->expectExceptionMessage('Logging directory is not exist or is not writable');
         mkdir('logs', 111);
         $handler = new FileHandler(new SimpleLineFormatter(), 'logs', 'test');
 

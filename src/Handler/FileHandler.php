@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace flotzilla\Logger\Handler;
 
+use flotzilla\Logger\Exception\FormatterException;
+use flotzilla\Logger\Exception\HandlerException;
 use flotzilla\Logger\Exception\InvalidConfigurationException;
 use flotzilla\Logger\Formatter\FormatterInterface;
 use flotzilla\Logger\Helper\Helper;
@@ -68,6 +70,9 @@ class FileHandler implements HandlerInterface
      * @param string $level
      * @param string $date
      * @return bool operation success status
+     *
+     * @throws FormatterException
+     * @throws HandlerException
      */
     public function handle(
         string $message = '',
@@ -76,9 +81,11 @@ class FileHandler implements HandlerInterface
         string $date = ''
     ): bool
     {
-        return $this->appendLog(
-            $this->formatter->format($message, $context, $level, $date) . PHP_EOL
-        );
+        if (!$isSuccess = $this->appendLog($this->formatter->format($message, $context, $level, $date) . PHP_EOL)){
+            throw new HandlerException('Error during witting log message to file', $message, $context, $level, $date);
+        }
+
+        return $isSuccess;
     }
 
     /**
@@ -104,7 +111,7 @@ class FileHandler implements HandlerInterface
 
     /**
      * Append content to log file
-     * If log directory does not exists will return false.
+     * If log directory does not exist will return false.
      * If content cannot be written to file or file cannot be opened will return false
      *
      * @param string $log string to be written to file

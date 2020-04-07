@@ -32,16 +32,20 @@ interface ChannelInterface
     public function getChannelName(): string;
 
     /**
+     * Push log message to all subscribed handlers. Return boolean true if there is no errors, else array with errors.
+     * Return true in case if channel was disabled or channel log level is not appropriate (do not pass min/max loglevel checks)
+     *
      * @param string $message
      * @param array $context
      * @param string $level
      * @param string $date
+     *
+     * @return mixed
      */
     public function handle(
         string $message = '',
         array $context = [],
         string $level = LogLevel::DEBUG,
         string $date = ''
-
     );
 }
