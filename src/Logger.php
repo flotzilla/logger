@@ -30,7 +30,7 @@ class Logger implements LoggerInterface
     /** @var DateTimeZone $timeZone */
     protected $timeZone;
 
-    // TODO fix this
+    /** @var ErrorHandler $errorHandler */
     protected $errorHandler;
 
     /**
@@ -38,9 +38,15 @@ class Logger implements LoggerInterface
      * @param ChannelInterface[] $channels
      * @param string $dateTimeFormat that can be passed to date() or constant from DateTimeInterface
      * @param DateTimeZone|null $tz
+     * @param ErrorHandler $handler
      * @throws InvalidConfigurationException
      */
-    public function __construct(array $channels = [], string $dateTimeFormat = 'Y.j.m-h:i:s.u', DateTimeZone $tz = null)
+    public function __construct(
+        array $channels = [],
+        string $dateTimeFormat = 'Y.j.m-h:i:s.u',
+        DateTimeZone $tz = null,
+        ErrorHandler $handler = null
+    )
     {
         if (!Helper::isTimeFormatValid($dateTimeFormat)) {
             throw new InvalidConfigurationException('Invalid date time format');
@@ -49,6 +55,7 @@ class Logger implements LoggerInterface
         $this->channels = $channels;
         $this->dateTimeFormat = $dateTimeFormat;
         $this->timeZone = $tz ?: new DateTimeZone(date_default_timezone_get());
+        $this->errorHandler = $handler;
     }
 
     /**
@@ -91,7 +98,7 @@ class Logger implements LoggerInterface
             }
         }
 
-        if ($errors){
+        if ($errors) {
             $this->handleErrors($errors);
         }
 
@@ -103,14 +110,13 @@ class Logger implements LoggerInterface
      */
     public function handleErrors(array $errors)
     {
-        foreach ($errors as $error) {
-            if ($this->errorHandler) {
-                $this->errorHandler->handle($error);
-            } else {
-                // TODO whoa! what we got here?
-                throw $error;
-            }
+        //TODO rework this
+        if ($this->errorHandler) {
+            $this->errorHandler->handleErrors($errors);
+        } else {
+            throw;
         }
+
     }
 
     /**
