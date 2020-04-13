@@ -82,7 +82,7 @@ class Logger implements LoggerInterface
         foreach ($this->channels as $channel) {
             $response = $channel->handle($message, $context, $level, $date->format($this->dateTimeFormat));
 
-            if (!$response && is_array($response)) {
+            if (is_array($response)) {
                 $loggerErrors->mergeErrors($response);
             }
         }

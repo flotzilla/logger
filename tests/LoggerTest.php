@@ -3,8 +3,11 @@
 namespace flotzilla\Logger\Test;
 
 use flotzilla\Logger\Channel\Channel;
+use flotzilla\Logger\Exception\FormatterException;
 use flotzilla\Logger\Exception\InvalidConfigurationException;
 use flotzilla\Logger\Exception\InvalidLogLevelException;
+use flotzilla\Logger\Exception\LoggerErrorStackException;
+use flotzilla\Logger\Formatter\JsonFormatter;
 use flotzilla\Logger\Formatter\PsrFormatter;
 use flotzilla\Logger\Formatter\SimpleLineFormatter;
 use flotzilla\Logger\Handler\FileHandler;
@@ -169,7 +172,7 @@ class LoggerTest extends TestCase
         );
 
         $channel->setEnabled(false);
-        $channels = [ $channel];
+        $channels = [$channel];
 
         $logger = new Logger($channels);
         $logger->info("debug message");
@@ -229,5 +232,30 @@ class LoggerTest extends TestCase
             ],
             'wrong dateTime format'
         );
+    }
+
+    public function testThrowMultipleExceptions()
+    {
+        $jsonFormatterMock = $this->createMock(JsonFormatter::class);
+        $jsonFormatterMock->method('format')
+            ->willThrowException(new FormatterException);
+
+        $simpleFormatterMock = $this->createMock(SimpleLineFormatter::class);
+        $simpleFormatterMock->method('format')
+            ->willThrowException(new FormatterException);
+
+        $channels = [
+            new Channel('test',
+                [
+                    new FileHandler($simpleFormatterMock, 'tmp', 'test-main'),
+                    new FileHandler($jsonFormatterMock, 'tmp', 'test-additional')
+                ])
+        ];
+        $logger = new Logger($channels);
+        try{
+            $logger->info('test message', ['some_data' => ['text'=> 'sss']]);
+        } catch (LoggerErrorStackException $e){
+            $this->assertCount(2,$e->count());
+        }
     }
 }

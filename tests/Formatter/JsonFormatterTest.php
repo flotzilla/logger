@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace flotzilla\Logger\Test\Formatter;
 
 use flotzilla\Logger\Formatter\JsonFormatter;
@@ -34,12 +36,12 @@ class JsonFormatterTest extends TestCase
         );
 
 $expected = '{
-    "date": "' . $date. '",
+    "date": "' . $date . '",
     "message": "Test message",
     "level": "INFO",
     "data": "{}"
 }{
-    "date": "' . $date. '",
+    "date": "' . $date . '",
     "message": "Test message 2",
     "level": "INFO",
     "data": "{

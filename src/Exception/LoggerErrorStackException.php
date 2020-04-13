@@ -11,7 +11,7 @@ use Throwable;
 class LoggerErrorStackException extends Exception implements Countable
 {
     /** @var array $errorStack */
-    protected $errorStack;
+    protected $errorStack = [];
 
     protected $message = 'Invalid log level configuration';
 
@@ -22,7 +22,7 @@ class LoggerErrorStackException extends Exception implements Countable
     }
 
     /**
-     * @return mixed
+     * @return array
      */
     public function getErrorStack(): array
     {
@@ -30,9 +30,9 @@ class LoggerErrorStackException extends Exception implements Countable
     }
 
     /**
-     * @param mixed $errorStack
+     * @param array $errorStack
      */
-    public function setErrorStack($errorStack): void
+    public function setErrorStack(array $errorStack): void
     {
         $this->errorStack = $errorStack;
     }
@@ -45,6 +45,9 @@ class LoggerErrorStackException extends Exception implements Countable
         $this->errorStack[] = $error;
     }
 
+    /**
+     * @param array $errors
+     */
     public function mergeErrors(array $errors): void
     {
         $this->errorStack = array_merge($this->errorStack, $errors);

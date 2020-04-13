@@ -20,8 +20,8 @@ class LoggerBench
     {
         $channels = [
             new Channel('test', [
-                new FileHandler('test-simple-line', 'tmp', new SimpleLineFormatter()),
-                new FileHandler('test-psr-formatter', 'tmp', new PsrFormatter())
+                new FileHandler(new SimpleLineFormatter(), 'test-simple-line', 'tmp'),
+                new FileHandler(new PsrFormatter(), 'test-psr-formatter', 'tmp')
             ])
         ];
 
