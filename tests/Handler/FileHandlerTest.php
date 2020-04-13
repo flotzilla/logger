@@ -2,6 +2,7 @@
 
 namespace flotzilla\Logger\Test\Handler;
 
+use flotzilla\Logger\Exception\HandlerException;
 use flotzilla\Logger\Exception\InvalidConfigurationException;
 use flotzilla\Logger\Formatter\SimpleLineFormatter;
 use flotzilla\Logger\Handler\FileHandler;
@@ -43,7 +44,7 @@ class FileHandlerTest extends TestCase
     public function testDirectoryPermissionError()
     {
         $this->expectException(InvalidConfigurationException::class);
-        $this->expectExceptionMessage('Logging directory is not exist or is not writable');
+        $this->expectExceptionMessage('Logging directory is not exists or is not writable');
         mkdir('logs', 111);
         $handler = new FileHandler(new SimpleLineFormatter(), 'logs', 'test');
 
@@ -104,6 +105,8 @@ class FileHandlerTest extends TestCase
 
     public function testCorruptAppendLog()
     {
+        $this->expectException(HandlerException::class);
+        $this->expectExceptionMessage('Error during witting log message to file');
         $file = 'logs/test-' . date("j.n.Y") . '.log';
         $handler = new FileHandler(new TestFormatter, 'logs', 'test');
 

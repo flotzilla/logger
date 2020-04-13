@@ -65,9 +65,9 @@ class Logger implements LoggerInterface
      * Throw errors if no any error handler was provided.
      * @throws InvalidLogLevelException in case of wrong level format
      * @throws Exception cause of DateTimeImmutable creation
-     * @throws LoggerErrorStackException that can contain multiple exceptions from different sources e.g. exceptions
+     * @throws LoggerErrorStackException that can contain multiple exceptions from multiple sources e.g. exceptions
      * from handlers and formatters
-     * @see LogLevel for correct log formats
+     * @see LogLevel for correct $level log formats
      *
      */
     public function log($level, $message, array $context = [])
@@ -87,7 +87,7 @@ class Logger implements LoggerInterface
             }
         }
 
-        if ($loggerErrors->count() > 0){
+        if (count($loggerErrors) > 0){
             throw $loggerErrors;
         }
     }

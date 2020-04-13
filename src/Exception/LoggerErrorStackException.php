@@ -55,6 +55,6 @@ class LoggerErrorStackException extends Exception implements Countable
      */
     public function count()
     {
-        return count($this->errorStack);
+        return $this->errorStack;
     }
 }
