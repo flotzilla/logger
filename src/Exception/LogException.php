@@ -10,7 +10,7 @@ use Throwable;
 abstract class LogException extends Exception
 {
     /** @var string $message */
-    protected $message = 'Formatter Exception';
+    protected $message = 'Exception during logging';
 
     /** @var string $logMessage */
     protected $logMessage;

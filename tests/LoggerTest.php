@@ -186,7 +186,7 @@ class LoggerTest extends TestCase
     public function testWithWrongLevel()
     {
         $this->expectException(InvalidLogLevelException::class);
-        $this->expectExceptionMessage('some wrong level Log level is not exists');
+        $this->expectExceptionMessage('some wrong level Log level is not exist');
         $logger = new Logger();
         $logger->log('some wrong level', 'test mess');
     }
