@@ -34,7 +34,10 @@
     },
     "scripts": {
         "test": [
-            "phpunit"
+            "phpunit --configuration phpunit.xml --testsuite tests"
+        ],
+        "test_mock": [
+            "phpunit --configuration phpunit.xml --testsuite mock"
         ],
         "stan": [
             "vendor/bin/phpstan analyse -l 4 -c phpstan.neon.dist src"

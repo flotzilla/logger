@@ -9,7 +9,7 @@ namespace flotzilla\Logger\Formatter {
     }
 }
 
-namespace flotzilla\Logger\Test\Formatter {
+namespace flotzilla\Logger\Test\MockFormatter {
 
     use flotzilla\Logger\Exception\FormatterException;
     use flotzilla\Logger\Formatter\JsonFormatter;
@@ -26,9 +26,10 @@ namespace flotzilla\Logger\Test\Formatter {
         {
             $this->formatter = new JsonFormatter();
         }
+
         public function testException()
         {
-        $this->expectException(FormatterException::class);
+            $this->expectException(FormatterException::class);
 
             $date = date('Y-m-d H:i:s');
 

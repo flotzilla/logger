@@ -9,8 +9,12 @@
          processIsolation="false"
          stopOnFailure="false">
     <testsuites>
-        <testsuite name="Container tests">
+        <testsuite name="tests">
             <directory>./tests</directory>
+            <exclude>./tests/MockFormatter/</exclude>
+        </testsuite>
+        <testsuite name="mock">
+            <file>./tests/MockFormatter</file>
         </testsuite>
     </testsuites>
     <filter>
