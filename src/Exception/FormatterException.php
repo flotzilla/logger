@@ -6,5 +6,6 @@ namespace flotzilla\Logger\Exception;
 
 class FormatterException extends LogException
 {
+    /** @var string $message */
     protected $message = 'Formatter Exception';
 }

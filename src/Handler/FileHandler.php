@@ -81,7 +81,8 @@ class FileHandler implements HandlerInterface
         string $date = ''
     ): bool
     {
-        if (!$isSuccess = $this->appendLog($this->formatter->format($message, $context, $level, $date) . PHP_EOL)){
+        $formattedMessage = $this->formatter->format($message, $context, $level, $date);
+        if (!$isSuccess = $this->appendLog($formattedMessage . PHP_EOL)){
             throw new HandlerException('Error during witting log message to file', $message, $context, $level, $date);
         }
 

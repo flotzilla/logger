@@ -41,6 +41,9 @@ class SimpleLineFormatter implements FormatterInterface
         $this->contextSeparatorEnd = $contextSeparatorEnd;
     }
 
+    /**
+     * @inheritDoc
+     */
     public function format(
         string $message = '',
         array $context = [],

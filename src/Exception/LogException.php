@@ -24,6 +24,15 @@ abstract class LogException extends Exception
     /** @var string $logDate */
     protected $logDate;
 
+    /**
+     * LogException constructor.
+     * @param string $message error message
+     * @param string $logMessage
+     * @param array $context
+     * @param string $level
+     * @param string $date
+     * @param Throwable|null $previous
+     */
     public function __construct(
         string $message = '',
         string $logMessage = '',

@@ -12,6 +12,7 @@ class JsonFormatter implements FormatterInterface
     /** @var int $encodeOptions */
     protected $encodeOptions;
 
+    /** @var int $defaultEncodeOptions */
     protected $defaultEncodeOptions = JSON_FORCE_OBJECT | JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE
     | JSON_PARTIAL_OUTPUT_ON_ERROR | JSON_PRESERVE_ZERO_FRACTION | JSON_THROW_ON_ERROR;
 
@@ -25,8 +26,6 @@ class JsonFormatter implements FormatterInterface
     {
         $this->encodeOptions = $encoderOptions ?: $this->defaultEncodeOptions;
     }
-
-    //TODO finish this
 
     /**
      * @param string $message
@@ -49,13 +48,11 @@ class JsonFormatter implements FormatterInterface
             'date' => $date,
             'message' => $message,
             'level' => strtoupper($level),
-            'data' => '%encoded_data%'
+            'data' => $context
         ];
 
         try {
             $resultMessage = json_encode($jsonMessageArray, $this->encodeOptions);
-            $encodedData = json_encode($context, $this->encodeOptions);
-            $resultMessage = str_replace('%encoded_data%', $encodedData, $resultMessage);
         } catch (\JsonException $e) {
             throw new FormatterException('Json formatting error',
                 $message,

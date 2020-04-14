@@ -8,8 +8,6 @@ use DateTimeImmutable;
 use DateTimeZone;
 use Exception;
 use flotzilla\Logger\Channel\ChannelInterface;
-use flotzilla\Logger\Exception\FormatterException;
-use flotzilla\Logger\Exception\HandlerException;
 use flotzilla\Logger\Exception\InvalidConfigurationException;
 use flotzilla\Logger\Exception\InvalidLogLevelException;
 use flotzilla\Logger\Exception\LoggerErrorStackException;

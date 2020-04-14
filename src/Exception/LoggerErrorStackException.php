@@ -13,8 +13,15 @@ class LoggerErrorStackException extends Exception implements Countable
     /** @var array $errorStack */
     protected $errorStack = [];
 
+    /** @var string $message */
     protected $message = 'Invalid log level configuration';
 
+    /**
+     * LoggerErrorStackException constructor.
+     * @param string $message
+     * @param int $code
+     * @param Throwable|null $previous
+     */
     public function __construct($message = "", $code = 0, Throwable $previous = null)
     {
         $message = $message ?: $this->message;

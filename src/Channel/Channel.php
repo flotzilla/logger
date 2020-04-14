@@ -34,7 +34,7 @@ class Channel implements ChannelInterface, LoglevelInterface
     /**
      * Channel constructor.
      * @param string $channelName
-     * @param array $handlers
+     * @param HandlerInterface[] $handlers
      * @param string|null $maxLogLevel
      * @param string|null $minLogLevel
      *

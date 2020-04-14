@@ -6,5 +6,6 @@ namespace flotzilla\Logger\Exception;
 
 class HandlerException extends LogException
 {
+    /** @var string $message */
     protected $message = 'Handler Exception';
 }
