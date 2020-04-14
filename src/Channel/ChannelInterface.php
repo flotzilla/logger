@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace flotzilla\Logger\Channel;
 
+use flotzilla\Logger\Exception\InvalidConfigurationException;
 use flotzilla\Logger\Handler\HandlerInterface;
 use flotzilla\Logger\LogLevel\LogLevel;
 
@@ -11,6 +12,7 @@ interface ChannelInterface
 {
     /**
      * @param HandlerInterface[] $handlers
+     * @throws InvalidConfigurationException
      */
     public function setHandlers(array $handlers): void;
 
@@ -21,10 +23,9 @@ interface ChannelInterface
 
     /**
      * @param HandlerInterface $handler
-     * @param string|null $handlerName
      * @return mixed
      */
-    public function addHandler(HandlerInterface $handler, string $handlerName = null);
+    public function addHandler(HandlerInterface $handler);
 
     /**
      * @return string
@@ -32,8 +33,10 @@ interface ChannelInterface
     public function getChannelName(): string;
 
     /**
-     * Push log message to all subscribed handlers. Return boolean true if there is no errors, else array with errors.
-     * Return true in case if channel was disabled or channel log level is not appropriate (do not pass min/max loglevel checks)
+     * Push log message to all subscribed handlers. Return boolean true if there is no errors,
+     * otherwise return array with errors.
+     * Return true in case if channel was disabled or channel log level is not appropriate
+     * (loglevel did not pass min/max checks)
      *
      * @param string $message
      * @param array $context
@@ -48,4 +51,16 @@ interface ChannelInterface
         string $level = LogLevel::DEBUG,
         string $date = ''
     );
+
+    /**
+     * Is current channel enabled
+     * @return bool
+     */
+    public function isEnabled(): bool;
+
+    /**
+     * Set state of the channel - disable for logs write or enable them
+     * @param bool $enabled
+     */
+    public function setEnabled(bool $enabled): void;
 }

@@ -84,13 +84,13 @@ class ChannelTest extends TestCase
 
         $this->assertCount(0, $this->channel->getHandlers());
 
-        $this->channel->addHandler($handler1, 'test-main-handler');
+        $this->channel->addHandler($handler1);
         $this->assertCount(1, $this->channel->getHandlers());
-        $this->channel->addHandler($handler2, 'test-additional-handler');
+        $this->channel->addHandler($handler2);
         $this->assertCount(2, $this->channel->getHandlers());
 
-        $this->assertInstanceOf(FileHandler::class, $this->channel->getHandlers()['test-main-handler']);
-        $this->assertInstanceOf(FileHandler::class, $this->channel->getHandlers()['test-additional-handler']);
+        $this->assertInstanceOf(FileHandler::class, $this->channel->getHandlers()[0]);
+        $this->assertInstanceOf(FileHandler::class, $this->channel->getHandlers()[1]);
     }
 
     public function testGetChannelName()
