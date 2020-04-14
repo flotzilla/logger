@@ -6,6 +6,7 @@ namespace flotzilla\Logger\Channel;
 
 use flotzilla\Logger\Exception\FormatterException;
 use flotzilla\Logger\Exception\HandlerException;
+use flotzilla\Logger\Exception\InvalidChannelNameException;
 use flotzilla\Logger\Exception\InvalidLogLevelException;
 use flotzilla\Logger\LogLevel\LogLevel;
 use flotzilla\Logger\LogLevel\LoglevelInterface;
@@ -39,6 +40,7 @@ class Channel implements ChannelInterface, LoglevelInterface
      * @param string|null $minLogLevel
      *
      * @throws InvalidLogLevelException
+     * @throws InvalidChannelNameException
      */
     public function __construct(
         string $channelName,
@@ -47,6 +49,10 @@ class Channel implements ChannelInterface, LoglevelInterface
         string $minLogLevel = null
     )
     {
+        if (!$channelName){
+            throw new InvalidChannelNameException();
+        }
+
         $this->channelName = $channelName;
         $this->handlers = $handlers;
 

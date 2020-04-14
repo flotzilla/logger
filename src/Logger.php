@@ -8,6 +8,7 @@ use DateTimeImmutable;
 use DateTimeZone;
 use Exception;
 use flotzilla\Logger\Channel\ChannelInterface;
+use flotzilla\Logger\Channel\NullChannel;
 use flotzilla\Logger\Exception\InvalidConfigurationException;
 use flotzilla\Logger\Exception\InvalidLogLevelException;
 use flotzilla\Logger\Exception\LoggerErrorStackException;
@@ -21,7 +22,7 @@ class Logger implements LoggerInterface
     use LoggerTrait;
 
     /** @var ChannelInterface[] */
-    protected $channels;
+    protected $channels = [];
 
     /** @var string $dateTimeFormat */
     protected $dateTimeFormat;
@@ -46,7 +47,7 @@ class Logger implements LoggerInterface
             throw new InvalidConfigurationException('Invalid date time format');
         }
 
-        $this->channels = $channels;
+        $this->setChannels($channels);
         $this->dateTimeFormat = $dateTimeFormat;
         $this->timeZone = $tz ?: new DateTimeZone(date_default_timezone_get());
     }
@@ -85,7 +86,7 @@ class Logger implements LoggerInterface
             }
         }
 
-        if (count($loggerErrors) > 0){
+        if (count($loggerErrors) > 0) {
             throw $loggerErrors;
         }
     }
@@ -100,10 +101,43 @@ class Logger implements LoggerInterface
 
     /**
      * @param ChannelInterface[] $channels
+     * @throws InvalidConfigurationException
      */
     public function setChannels(array $channels): void
     {
-        $this->channels = $channels;
+        foreach ($channels as $channel)
+        {
+            if (!$channel instanceof ChannelInterface){
+                throw new InvalidConfigurationException('Array arguments should be instance of ChannelInterface');
+            }
+
+            $this->addChannel($channel);;
+        }
+    }
+
+    /**
+     * @param ChannelInterface $channel
+     * @throws InvalidConfigurationException
+     */
+    public function addChannel(ChannelInterface $channel): void
+    {
+        if (array_key_exists($channel->getChannelName(), $this->channels))
+        {
+            throw new InvalidConfigurationException(
+                "Channel with name {$channel->getChannelName()} already exist in runtime")
+            ;
+        }
+
+        $this->channels[$channel->getChannelName()] = $channel;
+    }
+
+    /**
+     * @param string $name
+     * @return ChannelInterface|null
+     */
+    public function getChannel(string $name): ?ChannelInterface
+    {
+        return array_key_exists($name, $this->channels)? $this->channels[$name]: new NullChannel;
     }
 
     /**

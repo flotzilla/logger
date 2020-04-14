@@ -3,6 +3,7 @@
 namespace flotzilla\Logger\Test\Channel;
 
 use flotzilla\Logger\Channel\Channel;
+use flotzilla\Logger\Exception\InvalidChannelNameException;
 use flotzilla\Logger\Exception\InvalidLogLevelException;
 use flotzilla\Logger\Formatter\SimpleLineFormatter;
 use flotzilla\Logger\Handler\FileHandler;
@@ -167,5 +168,11 @@ class ChannelTest extends TestCase
         $this->assertEquals(LogLevel::EMERGENCY, $c->getMinLogLevel());
 
         $c->setMinLogLevel('some wrong level');
+    }
+
+    public function testName()
+    {
+        $this->expectException(InvalidChannelNameException::class);
+        $c = new Channel('');
     }
 }
