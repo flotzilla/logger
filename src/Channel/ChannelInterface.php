@@ -4,28 +4,15 @@ declare(strict_types=1);
 
 namespace flotzilla\Logger\Channel;
 
-use flotzilla\Logger\Exception\InvalidConfigurationException;
 use flotzilla\Logger\Handler\HandlerInterface;
 use flotzilla\Logger\LogLevel\LogLevel;
 
 interface ChannelInterface
 {
     /**
-     * @param HandlerInterface[] $handlers
-     * @throws InvalidConfigurationException
-     */
-    public function setHandlers(array $handlers): void;
-
-    /**
      * @return HandlerInterface[]
      */
     public function getHandlers(): array;
-
-    /**
-     * @param HandlerInterface $handler
-     * @return mixed
-     */
-    public function addHandler(HandlerInterface $handler);
 
     /**
      * @return string

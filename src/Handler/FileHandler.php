@@ -128,8 +128,10 @@ class FileHandler implements HandlerInterface
         }
 
         if ($file = fopen($this->fileName, 'a')) {
-            $result = fwrite($file, $log) !== false && fclose($file);
+            $result = fwrite($file, $log) !== false;
         }
+
+        fclose($file);
 
         return $result;
     }
@@ -148,7 +150,7 @@ class FileHandler implements HandlerInterface
 
         // found slash at end
         if (strpos($path, '/', strlen($path) - 1)) {
-            return substr($path, 0, strlen($path) - 1);
+            return substr($path, 0, -1);
         }
 
         return $path;

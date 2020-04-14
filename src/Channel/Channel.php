@@ -42,6 +42,7 @@ class Channel implements ChannelInterface, LoglevelInterface
      *
      * @throws InvalidLogLevelException
      * @throws InvalidChannelNameException
+     * @throws InvalidConfigurationException
      */
     public function __construct(
         string $channelName,
@@ -54,8 +55,9 @@ class Channel implements ChannelInterface, LoglevelInterface
             throw new InvalidChannelNameException();
         }
 
+        $this->setHandlers($handlers);
+
         $this->channelName = $channelName;
-        $this->handlers = $handlers;
 
         if ($maxLogLevel === null) {
             $maxLogLevel = LogLevel::DEBUG;
@@ -71,6 +73,21 @@ class Channel implements ChannelInterface, LoglevelInterface
 
         $this->maxLogLevel = strtolower($maxLogLevel);
         $this->minLogLevel = strtolower($minLogLevel);
+    }
+
+    /**
+     * @param array $handlers
+     * @throws InvalidConfigurationException
+     */
+    private function setHandlers(array $handlers): void
+    {
+        foreach ($handlers as $handler) {
+            if (!$handler instanceof HandlerInterface){
+                throw new InvalidConfigurationException('Array arguments should be instance of HandlerInterface');
+            }
+
+            $this->handlers[] = $handler;
+        }
     }
 
     /**
@@ -110,31 +127,9 @@ class Channel implements ChannelInterface, LoglevelInterface
     /**
      * @inheritDoc
      */
-    public function setHandlers(array $handlers): void
-    {
-        foreach ($handlers as $handler) {
-            if (!$handler instanceof HandlerInterface){
-                throw new InvalidConfigurationException('Array arguments should be instance of HandlerInterface');
-            }
-
-            $this->handlers[] = $handler;
-        }
-    }
-
-    /**
-     * @inheritDoc
-     */
     public function getHandlers(): array
     {
         return $this->handlers;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function addHandler(HandlerInterface $handler)
-    {
-        $this->handlers[] = $handler;
     }
 
     /**

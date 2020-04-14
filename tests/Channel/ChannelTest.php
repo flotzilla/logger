@@ -4,9 +4,8 @@ namespace flotzilla\Logger\Test\Channel;
 
 use flotzilla\Logger\Channel\Channel;
 use flotzilla\Logger\Exception\InvalidChannelNameException;
+use flotzilla\Logger\Exception\InvalidConfigurationException;
 use flotzilla\Logger\Exception\InvalidLogLevelException;
-use flotzilla\Logger\Formatter\SimpleLineFormatter;
-use flotzilla\Logger\Handler\FileHandler;
 use flotzilla\Logger\LogLevel\LogLevel;
 use PHPUnit\Framework\TestCase;
 
@@ -53,44 +52,11 @@ class ChannelTest extends TestCase
         $channel = new Channel('testError', [], LogLevel::ALERT, 'invalidMinLevel');
     }
 
-    public function testSetHandlers()
+    public function testHandlersError()
     {
-        $handler1 = new FileHandler(new SimpleLineFormatter(), 'tmp', 'test-main');
-        $handler2 = new FileHandler(new SimpleLineFormatter(), 'tmp', 'test-additional');
-        $handlers = [$handler1, $handler2];
-        $this->channel->setHandlers($handlers);
-        $this->assertCount(2, $this->channel->getHandlers());
-        $this->assertInstanceOf(FileHandler::class, $this->channel->getHandlers()[0]);
-        $this->assertInstanceOf(FileHandler::class, $this->channel->getHandlers()[1]);
-    }
-
-    public function testAddHandlers()
-    {
-        $handler1 = new FileHandler(new SimpleLineFormatter(), 'tmp', 'test-main');
-        $handler2 = new FileHandler(new SimpleLineFormatter(), 'tmp', 'test-additional');
-
-        $this->assertCount(0, $this->channel->getHandlers());
-
-        $this->channel->addHandler($handler1);
-        $this->assertCount(1, $this->channel->getHandlers());
-        $this->channel->addHandler($handler2);
-        $this->assertCount(2, $this->channel->getHandlers());
-    }
-
-    public function testAddHandlerByName()
-    {
-        $handler1 = new FileHandler(new SimpleLineFormatter(), 'tmp', 'test-main');
-        $handler2 = new FileHandler(new SimpleLineFormatter(), 'tmp', 'test-additional');
-
-        $this->assertCount(0, $this->channel->getHandlers());
-
-        $this->channel->addHandler($handler1);
-        $this->assertCount(1, $this->channel->getHandlers());
-        $this->channel->addHandler($handler2);
-        $this->assertCount(2, $this->channel->getHandlers());
-
-        $this->assertInstanceOf(FileHandler::class, $this->channel->getHandlers()[0]);
-        $this->assertInstanceOf(FileHandler::class, $this->channel->getHandlers()[1]);
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage("Array arguments should be instance of HandlerInterface");
+        $channel = new Channel('testError', [new \stdClass()], LogLevel::ALERT, 'invalidMinLevel');
     }
 
     public function testGetChannelName()

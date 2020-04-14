@@ -69,7 +69,7 @@ class Logger implements LoggerInterface
      * @see LogLevel for correct $level log formats
      *
      */
-    public function log($level, $message, array $context = [])
+    public function log($level, $message, array $context = []): void
     {
         if (!in_array(strtolower($level), LogLevel::LOG_LEVELS)) {
             throw new InvalidLogLevelException("{$level} Log level is not exist");
