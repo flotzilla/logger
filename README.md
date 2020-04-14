@@ -44,7 +44,7 @@ use \flotzilla\Logger\Formatter\SimpleLineFormatter;
 
 $logger = new Logger();
 
- //output will be written to /tmp/main-logs.log
+//output will be written to /tmp/main-logs.log
 $channel = new Channel('logs-all', [
         new FileHandler(new SimpleLineFormatter(), '/tmp', 'main-logs')
     ]);
@@ -81,11 +81,6 @@ Channels
 ```php
 // disable channel for writing 
 $logger->getChannel('debug')->setEnabled(false);
-
-// add new handler
-$logger->getChannel('test')->addHandler(
-    new FileHandler( new SimpleLineFormatter(), '/tmp', 'main-logs')
-);
 
 // set maximal log level for filtering
 $logger->getChannel('test')->setMaxLogLevel('error');
