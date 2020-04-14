@@ -1,8 +1,8 @@
 <?php
 
+declare(strict_types=1);
 
 namespace flotzilla\Logger\Test\Formatter;
-
 
 use flotzilla\Logger\Formatter\FormatterInterface;
 use flotzilla\Logger\LogLevel\LogLevel;

@@ -2,6 +2,8 @@
 
 namespace flotzilla\Logger\Test\Handler;
 
+use flotzilla\Logger\Exception\FormatterException;
+use flotzilla\Logger\Exception\HandlerException;
 use flotzilla\Logger\Exception\InvalidConfigurationException;
 use flotzilla\Logger\Formatter\SimpleLineFormatter;
 use flotzilla\Logger\Handler\FileHandler;
@@ -104,6 +106,8 @@ class FileHandlerTest extends TestCase
 
     public function testCorruptAppendLog()
     {
+        $this->expectException(HandlerException::class);
+        $this->expectExceptionMessage('Error during witting log message to file');
         $file = 'logs/test-' . date("j.n.Y") . '.log';
         $handler = new FileHandler(new TestFormatter, 'logs', 'test');
 
@@ -119,5 +123,19 @@ class FileHandlerTest extends TestCase
         $this->expectException(InvalidConfigurationException::class);
         $this->expectExceptionMessage('Invalid datetime format');
         new FileHandler(new TestFormatter, 'logs', 'test', 'someDateTime');
+    }
+
+    public function testThrowFormatterException()
+    {
+        $this->expectException(FormatterException::class);
+
+        $mockFormatter = $this->createMock(TestFormatter::class);
+        $mockFormatter->method('format')
+            ->willThrowException(new FormatterException);
+        $fh = new FileHandler(
+            $mockFormatter, 'logs', 'test'
+        );
+
+        $fh->handle('some mess');
     }
 }

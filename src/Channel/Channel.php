@@ -4,6 +4,10 @@ declare(strict_types=1);
 
 namespace flotzilla\Logger\Channel;
 
+use flotzilla\Logger\Exception\FormatterException;
+use flotzilla\Logger\Exception\HandlerException;
+use flotzilla\Logger\Exception\InvalidChannelNameException;
+use flotzilla\Logger\Exception\InvalidConfigurationException;
 use flotzilla\Logger\Exception\InvalidLogLevelException;
 use flotzilla\Logger\LogLevel\LogLevel;
 use flotzilla\Logger\LogLevel\LoglevelInterface;
@@ -32,11 +36,12 @@ class Channel implements ChannelInterface, LoglevelInterface
     /**
      * Channel constructor.
      * @param string $channelName
-     * @param array $handlers
+     * @param HandlerInterface[] $handlers
      * @param string|null $maxLogLevel
      * @param string|null $minLogLevel
      *
      * @throws InvalidLogLevelException
+     * @throws InvalidChannelNameException
      */
     public function __construct(
         string $channelName,
@@ -45,6 +50,10 @@ class Channel implements ChannelInterface, LoglevelInterface
         string $minLogLevel = null
     )
     {
+        if (!$channelName){
+            throw new InvalidChannelNameException();
+        }
+
         $this->channelName = $channelName;
         $this->handlers = $handlers;
 
@@ -74,19 +83,28 @@ class Channel implements ChannelInterface, LoglevelInterface
         string $date = ''
     )
     {
+        $errors = [];
+        $isSuccess = true;
+
         if (!$this->enabled) {
-            return;
+            return $isSuccess;
         }
 
         if (!$this->maxLogLevelCheck($level, $this->maxLogLevel)
             || !$this->minLogLevelCheck($level, $this->minLogLevel)) {
-            return;
+            return $isSuccess;
         }
 
         foreach ($this->handlers as $handler) {
-            // TODO handle bool response
-            $handler->handle($message, $context, $level, $date);
+            try {
+                $isSuccess &= $handler->handle($message, $context, $level, $date);
+            } catch (HandlerException | FormatterException $e) {
+                $errors[] = $e;
+                continue;
+            }
         }
+
+        return $errors ?: $isSuccess;
     }
 
     /**
@@ -94,7 +112,13 @@ class Channel implements ChannelInterface, LoglevelInterface
      */
     public function setHandlers(array $handlers): void
     {
-        $this->handlers = $handlers;
+        foreach ($handlers as $handler) {
+            if (!$handler instanceof HandlerInterface){
+                throw new InvalidConfigurationException('Array arguments should be instance of HandlerInterface');
+            }
+
+            $this->handlers[] = $handler;
+        }
     }
 
     /**
@@ -108,11 +132,9 @@ class Channel implements ChannelInterface, LoglevelInterface
     /**
      * @inheritDoc
      */
-    public function addHandler(HandlerInterface $handler, string $handlerName = null)
+    public function addHandler(HandlerInterface $handler)
     {
-        $handlerName
-            ? $this->handlers[$handlerName] = $handler
-            : $this->handlers[] = $handler;
+        $this->handlers[] = $handler;
     }
 
     /**

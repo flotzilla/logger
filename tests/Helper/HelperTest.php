@@ -42,7 +42,6 @@ class HelperTest extends TestCase
     {
         return [
             ['some str'],
-            ['jm3'],
             ['a-a-a-a-a']
         ];
     }

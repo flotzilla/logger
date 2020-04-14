@@ -36,5 +36,4 @@ trait LogLevelTrait
         return $this->isLogLevelValid($level) && $this->isLogLevelValid($minLevel)
             && LogLevel::LOG_LEVELS_INT[strtolower($level)] >= LogLevel::LOG_LEVELS_INT[$minLevel];
     }
-
 }

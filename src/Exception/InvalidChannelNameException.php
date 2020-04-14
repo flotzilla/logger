@@ -4,13 +4,12 @@ declare(strict_types=1);
 
 namespace flotzilla\Logger\Exception;
 
-use Psr\Log\InvalidArgumentException;
 use Throwable;
 
-class InvalidLogLevelException extends InvalidArgumentException
+class InvalidChannelNameException extends \Exception
 {
     /** @var string $message */
-    protected $message = 'Invalid log level configuration';
+    protected $message = 'Channel name is invalid';
 
     /**
      * InvalidLogLevelException constructor.

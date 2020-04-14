@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace flotzilla\Logger\Test\Formatter;
 
 use flotzilla\Logger\Formatter\JsonFormatter;
@@ -18,40 +20,35 @@ class JsonFormatterTest extends TestCase
         $this->formatter = new JsonFormatter();
     }
 
-    /**
-     * @skipTest
-     */
     public function testFormat()
     {
-        $this->markTestIncomplete(
-            'This test has not been implemented yet.'
-        );
+        $date = date('Y-m-d H:i:s');
 
-        $record = [
-            'message' => 'Test message',
-            'level' => 'info',
-            'date' => date('Y-m-d H:i:s')
-        ];
-
-        $record2 = [
-            'message' => 'Test message 2',
-            'level' => 'info',
-            'date' => date('Y-m-d H:i:s'),
-            'context' => [
+        $formattedRecord = $this->formatter->format('Test message', [], LogLevel::INFO, date('Y-m-d H:i:s'));
+        $formattedRecord .= $this->formatter->format(
+            'Test message 2',
+            [
                 'some additional data' => 123,
                 'some additional data2' => 321,
-            ]
-        ];
-
-        $formattedRecord = $this->formatter->format('Test message', [],LogLevel::INFO, date('Y-m-d H:i:s'));
-        $formattedRecord .= $this->formatter->format('Test message 2', [],LogLevel::INFO, date('Y-m-d H:i:s'), [
-                'some additional data' => 123,
-                'some additional data2' => 321,
-            ]
+            ],
+            LogLevel::INFO,
+            $date
         );
 
-        $expected = json_encode($record) . PHP_EOL
-            .  json_encode($record2) . PHP_EOL;
+$expected = '{
+    "date": "' . $date . '",
+    "message": "Test message",
+    "level": "INFO",
+    "data": {}
+}{
+    "date": "' . $date . '",
+    "message": "Test message 2",
+    "level": "INFO",
+    "data": {
+        "some additional data": 123,
+        "some additional data2": 321
+    }
+}';
 
         $this->assertEquals($expected, $formattedRecord);
     }

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace flotzilla\Logger\Formatter;
 
+use flotzilla\Logger\Exception\FormatterException;
 use flotzilla\Logger\LogLevel\LogLevel;
 
 interface FormatterInterface
@@ -15,7 +16,10 @@ interface FormatterInterface
      * @param string $level
      * @param string $date
      * @param array $context
+     *
      * @return string
+     *
+     * @throws FormatterException
      */
     public function format(
         string $message = '',

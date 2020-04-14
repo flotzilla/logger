@@ -3,13 +3,18 @@
 namespace flotzilla\Logger\Test;
 
 use flotzilla\Logger\Channel\Channel;
+use flotzilla\Logger\Exception\FormatterException;
+use flotzilla\Logger\Exception\InvalidChannelNameException;
 use flotzilla\Logger\Exception\InvalidConfigurationException;
 use flotzilla\Logger\Exception\InvalidLogLevelException;
+use flotzilla\Logger\Exception\LoggerErrorStackException;
+use flotzilla\Logger\Formatter\JsonFormatter;
 use flotzilla\Logger\Formatter\PsrFormatter;
 use flotzilla\Logger\Formatter\SimpleLineFormatter;
 use flotzilla\Logger\Handler\FileHandler;
 use flotzilla\Logger\Logger;
 use flotzilla\Logger\LogLevel\LogLevel;
+use flotzilla\Logger\Test\Formatter\TestFormatter;
 use PHPUnit\Framework\TestCase;
 
 class LoggerTest extends TestCase
@@ -169,7 +174,7 @@ class LoggerTest extends TestCase
         );
 
         $channel->setEnabled(false);
-        $channels = [ $channel];
+        $channels = [$channel];
 
         $logger = new Logger($channels);
         $logger->info("debug message");
@@ -186,7 +191,7 @@ class LoggerTest extends TestCase
     public function testWithWrongLevel()
     {
         $this->expectException(InvalidLogLevelException::class);
-        $this->expectExceptionMessage('some wrong level Log level is not exists');
+        $this->expectExceptionMessage('some wrong level Log level is not exist');
         $logger = new Logger();
         $logger->log('some wrong level', 'test mess');
     }
@@ -229,5 +234,110 @@ class LoggerTest extends TestCase
             ],
             'wrong dateTime format'
         );
+    }
+
+    public function testThrowMultipleExceptions()
+    {
+        $jsonFormatterMock = $this->createMock(JsonFormatter::class);
+        $jsonFormatterMock->method('format')
+            ->willThrowException(new FormatterException);
+
+        $simpleFormatterMock = $this->createMock(SimpleLineFormatter::class);
+        $simpleFormatterMock->method('format')
+            ->willThrowException(new FormatterException);
+
+        $channels = [
+            new Channel('test',
+                [
+                    new FileHandler($simpleFormatterMock, 'tmp', 'test-main'),
+                    new FileHandler($jsonFormatterMock, 'tmp', 'test-additional')
+                ])
+        ];
+        $logger = new Logger($channels);
+        try {
+            $logger->info('test message', ['some_data' => ['text' => 'sss']]);
+        } catch (LoggerErrorStackException $e) {
+            $this->assertCount(2, $e->count());
+        }
+    }
+
+    public function testThrowOneError()
+    {
+        $simpleFormatterMock = $this->createMock(SimpleLineFormatter::class);
+        $simpleFormatterMock->method('format')
+            ->willThrowException(new FormatterException);
+
+        $channels = [
+            new Channel('test',
+                [
+                    new FileHandler($simpleFormatterMock, 'tmp', 'test-main'),
+                    new FileHandler(new JsonFormatter(), 'tmp', 'test-additional')
+                ])
+        ];
+        $logger = new Logger($channels);
+        try {
+            $logger->info('test message', ['some_data' => ['text' => 'sss']]);
+
+        } catch (LoggerErrorStackException $e) {
+            $this->assertCount(1, $e->count());
+            $this->assertTrue(file_exists('tmp/test-additional-' . date('j.n.Y') . '.log'));
+        }
+    }
+
+    public function testEmptyNameChannel()
+    {
+        $this->expectException(InvalidChannelNameException::class);
+        $logger = new Logger();
+        $logger->addChannel(new Channel('', [ new FileHandler(new TestFormatter) ]));
+    }
+
+    public function testSetEmptyChannels()
+    {
+        $logger = new Logger();
+        $logger->setChannels([]);
+        $this->assertCount(0, $logger->getChannels());
+    }
+
+    public function testSetInvalidChannels()
+    {
+        $this->expectException(InvalidConfigurationException::class);
+        $logger = new Logger();
+        $logger->setChannels([
+            new \stdClass(),
+            ""
+        ]);
+    }
+
+    public function testAddExistingChannel()
+    {
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage('Channel with name c already exist in runtime');
+        $logger = new Logger();
+        $logger->addChannel(new Channel('c'));
+        $logger->addChannel(new Channel('c'));
+    }
+
+    public function testGetChannelByName()
+    {
+        $logger = new Logger();
+        $logger->addChannel(new Channel('c'));
+
+        $this->assertInstanceOf(Channel::class, $logger->getChannel('c'));
+    }
+
+    public function testMultipleChannelsGet()
+    {
+        $logger = new Logger();
+        $c1 = new Channel('c1');
+        $c2 = new Channel('c2');
+
+        $logger->addChannel($c1);
+        $logger->addChannel($c2);
+
+        $this->assertInstanceOf(Channel::class, $logger->getChannel('c1'));
+        $this->assertInstanceOf(Channel::class, $logger->getChannel('c2'));
+        $this->assertEquals($c1, $logger->getChannel('c1'));
+        $this->assertEquals($c2, $logger->getChannel('c2'));
+        $this->assertCount(2, $logger->getChannels());
     }
 }

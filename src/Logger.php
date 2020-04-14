@@ -4,11 +4,14 @@ declare(strict_types=1);
 
 namespace flotzilla\Logger;
 
+use DateTimeImmutable;
 use DateTimeZone;
 use Exception;
 use flotzilla\Logger\Channel\ChannelInterface;
+use flotzilla\Logger\Channel\NullChannel;
 use flotzilla\Logger\Exception\InvalidConfigurationException;
 use flotzilla\Logger\Exception\InvalidLogLevelException;
+use flotzilla\Logger\Exception\LoggerErrorStackException;
 use flotzilla\Logger\Helper\Helper;
 use flotzilla\Logger\LogLevel\LogLevel;
 use Psr\Log\LoggerInterface;
@@ -19,7 +22,7 @@ class Logger implements LoggerInterface
     use LoggerTrait;
 
     /** @var ChannelInterface[] */
-    protected $channels;
+    protected $channels = [];
 
     /** @var string $dateTimeFormat */
     protected $dateTimeFormat;
@@ -34,13 +37,17 @@ class Logger implements LoggerInterface
      * @param DateTimeZone|null $tz
      * @throws InvalidConfigurationException
      */
-    public function __construct(array $channels = [], string $dateTimeFormat = 'Y.j.m-h:i:s.u', DateTimeZone $tz = null)
+    public function __construct(
+        array $channels = [],
+        string $dateTimeFormat = 'Y.j.m-h:i:s.u',
+        DateTimeZone $tz = null
+    )
     {
         if (!Helper::isTimeFormatValid($dateTimeFormat)) {
             throw new InvalidConfigurationException('Invalid date time format');
         }
 
-        $this->channels = $channels;
+        $this->setChannels($channels);
         $this->dateTimeFormat = $dateTimeFormat;
         $this->timeZone = $tz ?: new DateTimeZone(date_default_timezone_get());
     }
@@ -48,26 +55,39 @@ class Logger implements LoggerInterface
     /**
      * Logs with an arbitrary level.
      *
-     * @param mixed $level
-     * @param string $message
-     * @param array $context
+     * @param mixed $level LogLevel formats
+     * @param string $message message to log
+     * @param array $context additional data
      *
      * @return void
      *
-     * @throws InvalidLogLevelException
-     * @throws Exception
+     * Throw errors if no any error handler was provided.
+     * @throws InvalidLogLevelException in case of wrong level format
+     * @throws Exception cause of DateTimeImmutable creation
+     * @throws LoggerErrorStackException that can contain multiple exceptions from multiple sources e.g. exceptions
+     * from handlers and formatters
+     * @see LogLevel for correct $level log formats
+     *
      */
     public function log($level, $message, array $context = [])
     {
         if (!in_array(strtolower($level), LogLevel::LOG_LEVELS)) {
-            throw new InvalidLogLevelException("{$level} Log level is not exists");
+            throw new InvalidLogLevelException("{$level} Log level is not exist");
         }
 
-        $date = new \DateTimeImmutable('now', $this->timeZone);
+        $date = new DateTimeImmutable('now', $this->timeZone);
 
-        // TODO add exception handler
+        $loggerErrors = new LoggerErrorStackException();
         foreach ($this->channels as $channel) {
-            $channel->handle($message, $context, $level, $date->format($this->dateTimeFormat));
+            $response = $channel->handle($message, $context, $level, $date->format($this->dateTimeFormat));
+
+            if (is_array($response)) {
+                $loggerErrors->mergeErrors($response);
+            }
+        }
+
+        if (count($loggerErrors) > 0) {
+            throw $loggerErrors;
         }
     }
 
@@ -81,10 +101,43 @@ class Logger implements LoggerInterface
 
     /**
      * @param ChannelInterface[] $channels
+     * @throws InvalidConfigurationException
      */
     public function setChannels(array $channels): void
     {
-        $this->channels = $channels;
+        foreach ($channels as $channel)
+        {
+            if (!$channel instanceof ChannelInterface){
+                throw new InvalidConfigurationException('Array arguments should be instance of ChannelInterface');
+            }
+
+            $this->addChannel($channel);;
+        }
+    }
+
+    /**
+     * @param ChannelInterface $channel
+     * @throws InvalidConfigurationException
+     */
+    public function addChannel(ChannelInterface $channel): void
+    {
+        if (array_key_exists($channel->getChannelName(), $this->channels))
+        {
+            throw new InvalidConfigurationException(
+                "Channel with name {$channel->getChannelName()} already exist in runtime")
+            ;
+        }
+
+        $this->channels[$channel->getChannelName()] = $channel;
+    }
+
+    /**
+     * @param string $name
+     * @return ChannelInterface|null
+     */
+    public function getChannel(string $name): ?ChannelInterface
+    {
+        return array_key_exists($name, $this->channels)? $this->channels[$name]: new NullChannel;
     }
 
     /**
@@ -103,3 +156,4 @@ class Logger implements LoggerInterface
         return $this->timeZone;
     }
 }
+
