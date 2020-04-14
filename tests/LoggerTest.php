@@ -252,10 +252,33 @@ class LoggerTest extends TestCase
                 ])
         ];
         $logger = new Logger($channels);
-        try{
-            $logger->info('test message', ['some_data' => ['text'=> 'sss']]);
-        } catch (LoggerErrorStackException $e){
-            $this->assertCount(2,$e->count());
+        try {
+            $logger->info('test message', ['some_data' => ['text' => 'sss']]);
+        } catch (LoggerErrorStackException $e) {
+            $this->assertCount(2, $e->count());
+        }
+    }
+
+    public function testThrowOneError()
+    {
+        $simpleFormatterMock = $this->createMock(SimpleLineFormatter::class);
+        $simpleFormatterMock->method('format')
+            ->willThrowException(new FormatterException);
+
+        $channels = [
+            new Channel('test',
+                [
+                    new FileHandler($simpleFormatterMock, 'tmp', 'test-main'),
+                    new FileHandler(new JsonFormatter(), 'tmp', 'test-additional')
+                ])
+        ];
+        $logger = new Logger($channels);
+        try {
+            $logger->info('test message', ['some_data' => ['text' => 'sss']]);
+
+        } catch (LoggerErrorStackException $e) {
+            $this->assertCount(1, $e->count());
+            $this->assertTrue(file_exists('tmp/test-additional-' . date('j.n.Y') . '.log'));
         }
     }
 }

@@ -39,15 +39,15 @@ $expected = '{
     "date": "' . $date . '",
     "message": "Test message",
     "level": "INFO",
-    "data": "{}"
+    "data": {}
 }{
     "date": "' . $date . '",
     "message": "Test message 2",
     "level": "INFO",
-    "data": "{
-    "some additional data": 123,
-    "some additional data2": 321
-}"
+    "data": {
+        "some additional data": 123,
+        "some additional data2": 321
+    }
 }';
 
         $this->assertEquals($expected, $formattedRecord);
