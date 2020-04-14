@@ -2,6 +2,7 @@
 
 namespace flotzilla\Logger\Test\Handler;
 
+use flotzilla\Logger\Exception\FormatterException;
 use flotzilla\Logger\Exception\HandlerException;
 use flotzilla\Logger\Exception\InvalidConfigurationException;
 use flotzilla\Logger\Formatter\SimpleLineFormatter;
@@ -122,5 +123,19 @@ class FileHandlerTest extends TestCase
         $this->expectException(InvalidConfigurationException::class);
         $this->expectExceptionMessage('Invalid datetime format');
         new FileHandler(new TestFormatter, 'logs', 'test', 'someDateTime');
+    }
+
+    public function testThrowFormatterException()
+    {
+        $this->expectException(FormatterException::class);
+
+        $mockFormatter = $this->createMock(TestFormatter::class);
+        $mockFormatter->method('format')
+            ->willThrowException(new FormatterException);
+        $fh = new FileHandler(
+            $mockFormatter, 'logs', 'test'
+        );
+
+        $fh->handle('some mess');
     }
 }
