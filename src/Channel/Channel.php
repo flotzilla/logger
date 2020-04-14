@@ -7,6 +7,7 @@ namespace flotzilla\Logger\Channel;
 use flotzilla\Logger\Exception\FormatterException;
 use flotzilla\Logger\Exception\HandlerException;
 use flotzilla\Logger\Exception\InvalidChannelNameException;
+use flotzilla\Logger\Exception\InvalidConfigurationException;
 use flotzilla\Logger\Exception\InvalidLogLevelException;
 use flotzilla\Logger\LogLevel\LogLevel;
 use flotzilla\Logger\LogLevel\LoglevelInterface;
@@ -111,7 +112,13 @@ class Channel implements ChannelInterface, LoglevelInterface
      */
     public function setHandlers(array $handlers): void
     {
-        $this->handlers = $handlers;
+        foreach ($handlers as $handler) {
+            if (!$handler instanceof HandlerInterface){
+                throw new InvalidConfigurationException('Array arguments should be instance of HandlerInterface');
+            }
+
+            $this->handlers[] = $handler;
+        }
     }
 
     /**
@@ -125,11 +132,9 @@ class Channel implements ChannelInterface, LoglevelInterface
     /**
      * @inheritDoc
      */
-    public function addHandler(HandlerInterface $handler, string $handlerName = null)
+    public function addHandler(HandlerInterface $handler)
     {
-        $handlerName
-            ? $this->handlers[$handlerName] = $handler
-            : $this->handlers[] = $handler;
+        $this->handlers[] = $handler;
     }
 
     /**
