@@ -133,7 +133,7 @@ class Logger implements LoggerInterface
 
     /**
      * @param string $name
-     * @return ChannelInterface|null
+     * @return ChannelInterface|NullChannel
      */
     public function getChannel(string $name): ?ChannelInterface
     {

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace flotzilla\Logger\Channel;
 
-use flotzilla\Logger\Handler\HandlerInterface;
 use flotzilla\Logger\LogLevel\LogLevel;
 use flotzilla\Logger\LogLevel\LoglevelInterface;
 
@@ -13,24 +12,9 @@ class NullChannel implements ChannelInterface, LoglevelInterface
     /**
      * @inheritDoc
      */
-    public function setHandlers(array $handlers): void
-    {
-
-    }
-
-    /**
-     * @inheritDoc
-     */
     public function getHandlers(): array
     {
         return [];
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function addHandler(HandlerInterface $handler, string $handlerName = null)
-    {
     }
 
     /**

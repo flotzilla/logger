@@ -3,6 +3,7 @@
 namespace flotzilla\Logger\Test;
 
 use flotzilla\Logger\Channel\Channel;
+use flotzilla\Logger\Channel\NullChannel;
 use flotzilla\Logger\Exception\FormatterException;
 use flotzilla\Logger\Exception\InvalidChannelNameException;
 use flotzilla\Logger\Exception\InvalidConfigurationException;
@@ -339,5 +340,13 @@ class LoggerTest extends TestCase
         $this->assertEquals($c1, $logger->getChannel('c1'));
         $this->assertEquals($c2, $logger->getChannel('c2'));
         $this->assertCount(2, $logger->getChannels());
+    }
+
+    public function testGetNullChannel()
+    {
+        $logger = new Logger();
+        $channel = $logger->getChannel('non existing');
+
+        $this->assertInstanceOf(NullChannel::class, $channel);
     }
 }
