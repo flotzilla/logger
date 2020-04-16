@@ -105,13 +105,12 @@ class Logger implements LoggerInterface
      */
     public function setChannels(array $channels): void
     {
-        foreach ($channels as $channel)
-        {
-            if (!$channel instanceof ChannelInterface){
+        foreach ($channels as $channel) {
+            if (!$channel instanceof ChannelInterface) {
                 throw new InvalidConfigurationException('Array arguments should be instance of ChannelInterface');
             }
 
-            $this->addChannel($channel);;
+            $this->addChannel($channel);
         }
     }
 
@@ -121,11 +120,9 @@ class Logger implements LoggerInterface
      */
     public function addChannel(ChannelInterface $channel): void
     {
-        if (array_key_exists($channel->getChannelName(), $this->channels))
-        {
+        if (array_key_exists($channel->getChannelName(), $this->channels)) {
             throw new InvalidConfigurationException(
-                "Channel with name {$channel->getChannelName()} already exist in runtime")
-            ;
+                "Channel with name {$channel->getChannelName()} already exist in runtime");
         }
 
         $this->channels[$channel->getChannelName()] = $channel;
@@ -137,7 +134,7 @@ class Logger implements LoggerInterface
      */
     public function getChannel(string $name): ?ChannelInterface
     {
-        return array_key_exists($name, $this->channels)? $this->channels[$name]: new NullChannel;
+        return array_key_exists($name, $this->channels) ? $this->channels[$name] : new NullChannel;
     }
 
     /**

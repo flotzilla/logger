@@ -82,7 +82,7 @@ class FileHandler implements HandlerInterface
     ): bool
     {
         $formattedMessage = $this->formatter->format($message, $context, $level, $date);
-        if (!$isSuccess = $this->appendLog($formattedMessage . PHP_EOL)){
+        if (!$isSuccess = $this->appendLog($formattedMessage . PHP_EOL)) {
             throw new HandlerException('Error during witting log message to file', $message, $context, $level, $date);
         }
 
@@ -127,11 +127,10 @@ class FileHandler implements HandlerInterface
             return $result;
         }
 
-        if ($file = fopen($this->fileName, 'a')) {
+        if ($file = fopen($this->fileName, 'w')) {
             $result = fwrite($file, $log) !== false;
+            fclose($file);
         }
-
-        fclose($file);
 
         return $result;
     }

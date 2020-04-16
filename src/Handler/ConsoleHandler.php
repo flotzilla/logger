@@ -33,7 +33,7 @@ class ConsoleHandler implements HandlerInterface
     {
         $formattedMessage = $this->formatter->format($message, $context, $level, $date);
 
-        echo $formattedMessage;
+        echo $formattedMessage . PHP_EOL;
 
         return true;
     }
