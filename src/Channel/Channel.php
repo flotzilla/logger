@@ -51,7 +51,7 @@ class Channel implements ChannelInterface, LoglevelInterface
         string $minLogLevel = null
     )
     {
-        if (!$channelName){
+        if (!$channelName) {
             throw new InvalidChannelNameException();
         }
 
@@ -82,7 +82,7 @@ class Channel implements ChannelInterface, LoglevelInterface
     private function setHandlers(array $handlers): void
     {
         foreach ($handlers as $handler) {
-            if (!$handler instanceof HandlerInterface){
+            if (!$handler instanceof HandlerInterface) {
                 throw new InvalidConfigurationException('Array arguments should be instance of HandlerInterface');
             }
 

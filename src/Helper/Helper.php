@@ -14,7 +14,7 @@ class Helper
      */
     public static function isTimeFormatValid(string $format): bool
     {
-        return \DateTime::createFromFormat($format , date($format)) != false;
+        return \DateTime::createFromFormat($format, date($format)) != false;
     }
 
     /**
