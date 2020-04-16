@@ -127,11 +127,10 @@ class FileHandler implements HandlerInterface
             return $result;
         }
 
-        if ($file = fopen($this->fileName, 'a')) {
+        if ($file = fopen($this->fileName, 'w')) {
             $result = fwrite($file, $log) !== false;
+            fclose($file);
         }
-
-        fclose($file);
 
         return $result;
     }
